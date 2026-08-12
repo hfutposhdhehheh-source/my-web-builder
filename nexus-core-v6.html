@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Hub V6</title>
-    <!-- Tailwind CSS CDN -->
+    <title>OmniCode Studio - AI Connected</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -12,687 +12,165 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: { 50: '#f0fdf4', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' }
+                        brand: { 500: '#6366f1', 600: '#4f46e5' }
                     }
                 }
             }
         }
     </script>
-    <!-- FontAwesome & Marked (สำหรับ Markdown) -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked.js สำหรับแปลงข้อความ AI เป็น Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased h-screen flex flex-hidden overflow-hidden select-none">
+<body class="bg-slate-950 text-slate-100 font-sans h-screen flex flex-col overflow-hidden select-none">
 
-    <!-- ==================== SECURITY: LOGIN & LOCKSCREEN ==================== -->
-    <div id="auth-overlay" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
-            
-            <!-- Step 1: Set/Enter Master Password -->
-            <div id="auth-step-1" class="space-y-4">
-                <div class="text-center">
-                    <div class="inline-flex p-3 bg-brand-500/10 text-brand-500 rounded-full text-2xl mb-2">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <h2 class="text-xl font-bold" id="auth-title">ตั้งรหัสผ่าน Master Password</h2>
-                    <p class="text-xs text-slate-400 mt-1" id="auth-desc">โปรดตั้งรหัสผ่านเพื่อเข้ารหัสข้อมูลทั้งหมดใน Hub ของคุณ</p>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">รหัสผ่านหลัก</label>
-                    <div class="relative">
-                        <input type="password" id="master-pass-input" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-500 pr-10" placeholder="••••••••">
-                        <button onclick="togglePassVisibility('master-pass-input')" class="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300">
-                            <i class="fa-solid fa-eye text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-                <button onclick="handleAuthSubmit()" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-medium py-2 rounded-lg text-sm transition">ดำเนินการต่อ</button>
-            </div>
-
-            <!-- Step 2: 2FA / Security Question Check -->
-            <div id="auth-step-2" class="space-y-4 hidden">
-                <div class="text-center">
-                    <div class="inline-flex p-3 bg-blue-500/10 text-blue-500 rounded-full text-2xl mb-2">
-                        <i class="fa-solid fa-fingerprint"></i>
-                    </div>
-                    <h2 class="text-xl font-bold">ยืนยันความปลอดภัยเพิ่มเติม</h2>
-                    <p class="text-xs text-slate-400 mt-1">กรอกคำถามกันลืม (รหัสสำรอง 4 ตัวเลข)</p>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">PIN 4 หลักสำรอง</label>
-                    <input type="password" maxlength="4" id="pin-input" class="w-full text-center tracking-widest text-lg bg-slate-950 border border-slate-800 rounded-lg py-2 focus:outline-none focus:border-blue-500" placeholder="0000">
-                </div>
-                <button onclick="completeLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 rounded-lg text-sm transition">เข้าสู่ Ultimate Hub</button>
-            </div>
-
-            <div class="mt-4 text-center">
-                <span id="auth-error" class="text-xs text-red-400"></span>
-            </div>
+    <!-- Topbar Header -->
+    <header class="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="bg-brand-500 text-white p-1.5 rounded-lg font-bold text-xs"><i class="fa-solid fa-brain"></i></div>
+            <h1 class="font-bold text-sm tracking-tight hidden sm:inline">OmniCode Studio</h1>
+            <select id="lang-selector" class="bg-slate-950 border border-slate-800 text-xs rounded px-2 py-1 text-slate-300 focus:outline-none focus:border-brand-500">
+                <option value="javascript">Lua / JavaScript</option>
+                <option value="html">HTML / CSS</option>
+                <option value="python">Python</option>
+                <option value="cpp">C++</option>
+                <option value="java">Java</option>
+                <option value="sql">SQL</option>
+                <option value="php">PHP</option>
+            </select>
         </div>
-    </div>
 
-    <!-- ==================== MAIN APP SHELL ==================== -->
-    <div id="app-container" class="flex h-full w-full opacity-0 transition-opacity duration-500 pointer-events-none">
+        <!-- ช่องใส่ API Key และปุ่มสั่งการ -->
+        <div class="flex items-center space-x-2">
+            <div class="relative">
+                <input type="password" id="api-key-input" placeholder="วาง Gemini API Key ที่นี่..." class="bg-slate-950 border border-slate-800 text-xs rounded-lg px-3 py-1.5 text-slate-300 w-40 sm:w-56 focus:outline-none focus:border-brand-500">
+            </div>
+            <button onclick="analyzeWithRealAI()" class="bg-brand-600 hover:bg-brand-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center space-x-1.5 shrink-0">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span class="hidden sm:inline">ให้ AI ตรวจสอบ</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 h-[calc(100vh-56px)] overflow-hidden">
         
-        <!-- Sidebar Navigation -->
-        <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between">
-            <div>
-                <!-- Brand Header -->
-                <div class="p-4 border-b border-slate-800 flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                        <div class="bg-brand-500 text-slate-950 p-1.5 rounded-lg font-bold text-sm">UH</div>
-                        <span id="sidebar-hub-name" class="font-bold text-sm tracking-tight truncate">Ultimate Hub V6</span>
-                    </div>
-                    <button onclick="triggerLock()" title="ล็อกระบบ" class="text-slate-500 hover:text-red-400 text-xs"><i class="fa-solid fa-lock"></i></button>
-                </div>
-
-                <!-- Module Navigation List -->
-                <nav id="module-nav" class="p-2 space-y-1 overflow-y-auto max-h-[calc(100vh-130px)]">
-                    <!-- โหลดผ่าน JS ตาม Plugin Manager -->
-                </nav>
+        <!-- Editor Section -->
+        <div class="lg:col-span-2 flex flex-col h-full border-r border-slate-800 bg-slate-900 relative">
+            <div class="bg-slate-950 px-4 py-2 text-xs font-semibold text-slate-400 flex items-center justify-between shrink-0 border-b border-slate-800">
+                <span><i class="fa-solid fa-file-code mr-1.5 text-brand-500"></i> พื้นที่เขียนโค้ด</span>
+                <span class="text-[10px] text-slate-500">Gemini API Powered</span>
             </div>
-
-            <!-- Bottom User & Quick Status -->
-            <div class="p-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                <span class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span><span>ออนไลน์ (Offline Mode)</span></span>
-                <button onclick="openModal('settings-modal')" class="hover:text-white"><i class="fa-solid fa-gear"></i></button>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="flex-1 flex flex-col min-w-0 bg-slate-950">
-            
-            <!-- Topbar Header -->
-            <header class="h-14 border-b border-slate-800 px-6 flex items-center justify-between bg-slate-900/50 backdrop-blur">
-                <div class="flex items-center space-x-3">
-                    <h1 id="current-view-title" class="text-base font-semibold">แดชบอร์ด</h1>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <button onclick="openCommandPalette()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-1.5 rounded-lg text-xs flex items-center space-x-2 border border-slate-700">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <span>ค้นหาด่วน...</span>
-                        <kbd class="bg-slate-900 px-1.5 py-0.5 rounded text-[10px] text-slate-400 border border-slate-800">Ctrl+K</kbd>
-                    </button>
-                    <div class="relative">
-                        <button onclick="toggleNotificationPanel()" class="text-slate-400 hover:text-white p-2 relative">
-                            <i class="fa-solid fa-bell"></i>
-                            <span id="notif-badge" class="absolute top-1 right-1 w-2 h-2 bg-brand-500 rounded-full hidden"></span>
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Dynamic Module Views Container -->
-            <div id="view-container" class="flex-1 overflow-y-auto p-6 relative">
-                <!-- เนื้อหาจะถูกสลับเปลี่ยนไปตามโมดูลที่เลือก -->
-            </div>
-        </main>
-    </div>
-
-    <!-- ==================== MODALS & COMMAND PALETTE ==================== -->
-    <!-- Command Palette Modal -->
-    <div id="cmd-palette" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-start justify-center pt-20 p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-lg shadow-2xl overflow-hidden">
-            <div class="p-3 border-b border-slate-800 flex items-center space-x-2">
-                <i class="fa-solid fa-magnifying-glass text-slate-500"></i>
-                <input type="text" id="cmd-input" oninput="handleGlobalSearch(this.value)" class="w-full bg-transparent text-sm focus:outline-none placeholder-slate-500" placeholder="พิมพ์ค้นหาข้อมูล, งาน, หรือโค้ด...">
-            </div>
-            <div id="cmd-results" class="p-2 max-h-60 overflow-y-auto space-y-1 text-xs">
-                <div class="p-2 text-slate-500 text-center">พิมพ์คำค้นหาที่คุณต้องการ...</div>
-            </div>
+            <textarea id="code-textarea" class="flex-1 bg-slate-900 p-4 font-mono text-xs text-slate-200 resize-none focus:outline-none leading-relaxed" placeholder="พิมพ์หรือวางโค้ดที่ต้องการให้ AI ตรวจสอบที่นี่..."></textarea>
         </div>
-    </div>
 
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6 shadow-2xl">
-            <div class="flex justify-between items-center pb-4 border-b border-slate-800 mb-4">
-                <h3 class="font-bold text-base"><i class="fa-solid fa-gear text-brand-500 mr-2"></i>ตั้งค่าระบบ & Plugin Manager</h3>
-                <button onclick="closeModal('settings-modal')" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <!-- AI Advisor Panel -->
+        <div class="flex flex-col h-full bg-slate-950 overflow-hidden">
+            <div class="bg-slate-900 px-4 py-2 text-xs font-semibold text-brand-400 flex items-center justify-between shrink-0 border-b border-slate-800">
+                <span><i class="fa-solid fa-robot mr-1.5"></i> ผลวิเคราะห์จาก AI</span>
+                <span id="ai-status-dot" class="w-2 h-2 rounded-full bg-slate-600"></span>
             </div>
-            <div class="space-y-6 text-xs">
-                <div>
-                    <h4 class="font-semibold text-slate-300 mb-2">ตั้งค่าทั่วไป</h4>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-slate-400 mb-1">เปลี่ยนชื่อ Hub</label>
-                            <input type="text" id="setting-hub-name" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 focus:outline-none focus:border-brand-500">
-                        </div>
-                        <div>
-                            <label class="block text-slate-400 mb-1">Master Password ใหม่</label>
-                            <input type="password" id="setting-new-pass" placeholder="เว้นว่างไว้หากไม่เปลี่ยน" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 focus:outline-none focus:border-brand-500">
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-slate-300 mb-2">Plugin / Module Manager (เปิด-ปิดระบบย่อย)</h4>
-                    <div id="plugin-toggles" class="grid grid-cols-2 gap-3">
-                        <!-- สร้างผ่าน JS -->
-                    </div>
-                </div>
-                <div class="pt-4 border-t border-slate-800 flex justify-end space-x-2">
-                    <button onclick="saveSettings()" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded font-medium">บันทึกการตั้งค่า</button>
+            <div id="ai-feedback-container" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs leading-relaxed">
+                <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-slate-300">
+                    <div class="font-bold text-brand-400 mb-1"><i class="fa-solid fa-circle-info mr-1"></i> วิธีใช้งาน</div>
+                    <p class="text-slate-400 text-[11px]">1. นำ Gemini API Key มาใส่ที่ช่องขวาบน<br>2. เขียนโค้ดฝั่งซ้าย<br>3. กดปุ่ม "ให้ AI ตรวจสอบ"</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notifications Container -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 border border-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs shadow-2xl transition-all duration-300 opacity-0 pointer-events-none z-50"></div>
 
-    <!-- ==================== SYSTEM CORE & JAVASCRIPT LOGIC ==================== -->
+    <!-- Script Logic เชื่อมต่อ Gemini API -->
     <script>
-        // --- STORAGE & INITIAL STATE ---
-        const DB_KEY = 'ultimate_hub_v6_db';
-        let db = JSON.parse(localStorage.getItem(DB_KEY)) || {
-            auth: { masterPass: null, pin: null, isLocked: true },
-            settings: { hubName: 'Ultimate Hub V6', theme: 'dark', autoSave: true },
-            plugins: { vault: true, tasks: true, codeCenter: true, tools: true, dashboard: true, security: true, trash: true },
-            vault: [],
-            tasks: [],
-            codeCenter: [],
-            trash: []
-        };
+        const apiKeyInput = document.getElementById('api-key-input');
+        const savedKey = localStorage.getItem('gemini_api_key');
+        if (savedKey) apiKeyInput.value = savedKey;
 
-        const modulesList = [
-            { id: 'dashboard', name: 'แดชบอร์ด', icon: 'fa-chart-pie' },
-            { id: 'vault', name: 'คลังข้อมูล (Vault)', icon: 'fa-book-bookmark' },
-            { id: 'tasks', name: 'ระบบงาน (Tasks)', icon: 'fa-list-check' },
-            { id: 'codeCenter', name: 'Code Center', icon: 'fa-code' },
-            { id: 'tools', name: 'เครื่องมือ (Tools)', icon: 'fa-toolbox' },
-            { id: 'security', name: 'ความปลอดภัย', icon: 'fa-shield-halved' },
-            { id: 'trash', name: 'ถังขยะ', icon: 'fa-trash' }
-        ];
-
-        let activeModule = 'dashboard';
-
-        function saveDB() {
-            localStorage.setItem(DB_KEY, JSON.stringify(db));
-            if(db.settings.autoSave) showToast('บันทึกข้อมูลอัตโนมัติเรียบร้อย', 'success');
-        }
-
-        // --- AUTHENTICATION & MULTI-STEP LOGIN ---
-        window.addEventListener('DOMContentLoaded', () => {
-            if(!db.auth.masterPass) {
-                document.getElementById('auth-title').innerText = 'ตั้งรหัสผ่าน Master Password';
-                document.getElementById('auth-desc').innerText = 'โปรดตั้งรหัสผ่านและ PIN 4 หลักเพื่อความปลอดภัยสูงสุด';
-            } else {
-                document.getElementById('auth-title').innerText = 'ยืนยันตัวตนเพื่อเข้าสู่ระบบ';
-                document.getElementById('auth-desc').innerText = 'กรอก Master Password ของคุณ';
-            }
-            renderPluginToggles();
+        apiKeyInput.addEventListener('input', () => {
+            localStorage.setItem('gemini_api_key', apiKeyInput.value.trim());
         });
 
-        function handleAuthSubmit() {
-            const pass = document.getElementById('master-pass-input').value;
-            if(!pass) {
-                showError('กรุณากรอกรหัสผ่าน');
+        async function analyzeWithRealAI() {
+            const apiKey = apiKeyInput.value.trim();
+            const code = document.getElementById('code-textarea').value.trim();
+            const lang = document.getElementById('lang-selector').value;
+            const container = document.getElementById('ai-feedback-container');
+            const statusDot = document.getElementById('ai-status-dot');
+
+            if (!apiKey) {
+                showToast('กรุณากรอก Gemini API Key ก่อนครับ');
                 return;
             }
-            if(!db.auth.masterPass) {
-                db.auth.masterPass = pass;
-                db.auth.pin = '1234'; // default pin for first setup
-                saveDB();
-                document.getElementById('auth-step-1').classList.add('hidden');
-                document.getElementById('auth-step-2').classList.remove('hidden');
-            } else {
-                if(pass === db.auth.masterPass) {
-                    document.getElementById('auth-step-1').classList.add('hidden');
-                    document.getElementById('auth-step-2').classList.remove('hidden');
-                } else {
-                    showError('รหัสผ่านไม่ถูกต้อง');
-                }
-            }
-        }
-
-        function completeLogin() {
-            const pin = document.getElementById('pin-input').value;
-            if(pin.length === 4) {
-                db.auth.isLocked = false;
-                document.getElementById('auth-overlay').classList.add('opacity-0', 'pointer-events-none');
-                setTimeout(() => document.getElementById('auth-overlay').remove(), 500);
-                document.getElementById('app-container').classList.remove('opacity-0', 'pointer-events-none');
-                initApp();
-            } else {
-                showError('กรุณากรอก PIN 4 หลักให้ครบ');
-            }
-        }
-
-        function triggerLock() {
-            location.reload();
-        }
-
-        function showError(msg) {
-            document.getElementById('auth-error').innerText = msg;
-        }
-
-        function togglePassVisibility(id) {
-            const input = document.getElementById(id);
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
-
-        // --- APP INITIALIZATION & NAVIGATION ---
-        function initApp() {
-            document.getElementById('sidebar-hub-name').innerText = db.settings.hubName;
-            renderNav();
-            switchModule(activeModule);
-        }
-
-        function renderNav() {
-            const nav = document.getElementById('module-nav');
-            nav.innerHTML = '';
-            modulesList.forEach(m => {
-                if(db.plugins[m.id] !== false || m.id === 'security') {
-                    const active = activeModule === m.id;
-                    nav.innerHTML += `
-                        <button onclick="switchModule('${m.id}')" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition ${active ? 'bg-brand-500/10 text-brand-500 border border-brand-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}">
-                            <i class="fa-solid ${m.icon} w-4 text-center"></i>
-                            <span>${m.name}</span>
-                        </button>
-                    `;
-                }
-            });
-        }
-
-        function switchModule(id) {
-            activeModule = id;
-            renderNav();
-            const titleObj = modulesList.find(m => m.id === id);
-            document.getElementById('current-view-title').innerText = titleObj ? titleObj.name : '';
-            renderModuleContent(id);
-        }
-
-        // --- RENDER MODULE CONTENTS ---
-        function renderModuleContent(id) {
-            const container = document.getElementById('view-container');
-            container.innerHTML = '';
-
-            switch(id) {
-                case 'dashboard':
-                    renderDashboardView(container);
-                    break;
-                case 'vault':
-                    renderVaultView(container);
-                    break;
-                case 'tasks':
-                    renderTasksView(container);
-                    break;
-                case 'codeCenter':
-                    renderCodeCenterView(container);
-                    break;
-                case 'tools':
-                    renderToolsView(container);
-                    break;
-                case 'security':
-                    renderSecurityView(container);
-                    break;
-                case 'trash':
-                    renderTrashView(container);
-                    break;
-            }
-        }
-
-        // 1. DASHBOARD
-        function renderDashboardView(container) {
-            const totalVault = db.vault.length;
-            const totalTasks = db.tasks.length;
-            const doneTasks = db.tasks.filter(t => t.status === 'Done').length;
-            const totalCode = db.codeCenter.length;
-
-            container.innerHTML = `
-                <div class="space-y-6">
-                    <div class="grid grid-cols-4 gap-4">
-                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-                            <div class="text-slate-400 text-xs mb-1">ข้อมูลในคลังทั้งหมด</div>
-                            <div class="text-2xl font-bold">${totalVault}</div>
-                        </div>
-                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-                            <div class="text-slate-400 text-xs mb-1">งานที่เสร็จแล้ว</div>
-                            <div class="text-2xl font-bold text-brand-500">${doneTasks} / ${totalTasks}</div>
-                        </div>
-                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-                            <div class="text-slate-400 text-xs mb-1">Code Snippets</div>
-                            <div class="text-2xl font-bold text-blue-400">${totalCode}</div>
-                        </div>
-                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-                            <div class="text-slate-400 text-xs mb-1">สถานะระบบ</div>
-                            <div class="text-xs font-semibold text-green-400 mt-2 flex items-center"><i class="fa-solid fa-circle-check mr-1"></i> ปกติ (ปลอดภัย)</div>
-                        </div>
-                    </div>
-                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl">
-                        <h3 class="font-bold text-sm mb-3">ยินดีต้อนรับกลับสู่ Ultimate Hub V6</h3>
-                        <p class="text-xs text-slate-400">ระบบทำงานอย่างเต็มรูปแบบ ข้อมูลทั้งหมดถูกจัดเก็บแบบออฟไลน์ในเครื่องของคุณอย่างปลอดภัย คุณสามารถเลือกเมนูด้านซ้ายเพื่อเริ่มต้นใช้งานโมดูลต่างๆ ได้ทันที</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        // 2. VAULT (คลังข้อมูล)
-        function renderVaultView(container) {
-            container.innerHTML = `
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <input type="text" oninput="filterVault(this.value)" placeholder="ค้นหาคลังข้อมูล..." class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-brand-500 w-64">
-                        <button onclick="addVaultItem()" class="bg-brand-600 hover:bg-brand-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium"><i class="fa-solid fa-plus mr-1"></i> เพิ่มข้อมูลใหม่</button>
-                    </div>
-                    <div id="vault-list" class="grid grid-cols-3 gap-4"></div>
-                </div>
-            `;
-            updateVaultList();
-        }
-
-        function updateVaultList(filter = '') {
-            const list = document.getElementById('vault-list');
-            if(!list) return;
-            list.innerHTML = '';
-            const filtered = db.vault.filter(v => v.title.toLowerCase().includes(filter.toLowerCase()));
-            if(filtered.length === 0) {
-                list.innerHTML = `<div class="col-span-3 text-center py-10 text-slate-500 text-xs">ไม่มีข้อมูลในคลัง</div>`;
+            if (!code) {
+                showToast('กรุณาใส่โค้ดที่ต้องการตรวจสอบ');
                 return;
             }
-            filtered.forEach(v => {
-                list.innerHTML += `
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col justify-between space-y-2">
-                        <div>
-                            <div class="flex justify-between items-start">
-                                <h4 class="font-bold text-sm">${v.title}</h4>
-                                <button onclick="deleteVault(${v.id})" class="text-slate-500 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                            <p class="text-xs text-slate-400 mt-1 line-clamp-3">${v.content}</p>
-                        </div>
-                        <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-800 flex justify-between">
-                            <span>หมวด: ${v.category || 'ทั่วไป'}</span>
-                            <span>${v.date}</span>
-                        </div>
-                    </div>
-                `;
-            });
-        }
 
-        function addVaultItem() {
-            const title = prompt('ชื่อหัวข้อข้อมูล:');
-            if(!title) return;
-            const content = prompt('รายละเอียดเนื้อหา:');
-            db.vault.push({ id: Date.now(), title, content: content || '', category: 'ทั่วไป', date: new Date().toLocaleDateString() });
-            saveDB();
-            updateVaultList();
-        }
+            showToast('AI กำลังวิเคราะห์โค้ด...');
+            statusDot.className = 'w-2 h-2 rounded-full bg-yellow-500 animate-pulse';
+            
+            container.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-slate-400 animate-pulse">กำลังประมวลผลผ่าน Gemini API...</div>`;
 
-        function deleteVault(id) {
-            const item = db.vault.find(v => v.id === id);
-            db.vault = db.vault.filter(v => v.id !== id);
-            db.trash.push({ ...item, deletedAt: new Date().toLocaleDateString() });
-            saveDB();
-            updateVaultList();
-            showToast('ย้ายไปถังขยะแล้ว', 'info');
-        }
+            const promptText = `คุณคือ Code Reviewer ผู้เชี่ยวชาญ กรุณาตรวจสอบโค้ดนี้อย่างละเอียด:
+\`\`\`
+${code}
+\`\`\`
+กรุณาจัดรูปแบบคำตอบเป็นภาษาไทย โดยแบ่งเป็น:
+1. 🔴 **จุดที่ต้องแก้ไขด่วน (สีแดง):** 
+2. 🟡 **จุดที่ควรปรับปรุง/เปลี่ยน (สีเหลือง):** 
+3. 🟢 **ส่วนที่ทำได้ดีแล้ว (สีเขียว):** 
+จัดรูปแบบให้อ่านง่าย กระชับ ใช้ Markdown ประกอบ`;
 
-        function filterVault(val) { updateVaultList(val); }
-
-        // 3. TASKS (ระบบงาน)
-        function renderTasksView(container) {
-            container.innerHTML = `
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <div class="flex space-x-2">
-                            <button onclick="filterTaskStatus('All')" class="bg-slate-800 px-3 py-1.5 rounded-lg text-xs text-slate-300">ทั้งหมด</button>
-                            <button onclick="filterTaskStatus('Todo')" class="bg-slate-800 px-3 py-1.5 rounded-lg text-xs text-slate-300">รอทำ</button>
-                            <button onclick="filterTaskStatus('Done')" class="bg-slate-800 px-3 py-1.5 rounded-lg text-xs text-slate-300">เสร็จแล้ว</button>
-                        </div>
-                        <button onclick="addTaskItem()" class="bg-brand-600 hover:bg-brand-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium"><i class="fa-solid fa-plus mr-1"></i> เพิ่มงานใหม่</button>
-                    </div>
-                    <div id="tasks-list" class="space-y-2"></div>
-                </div>
-            `;
-            updateTasksList();
-        }
-
-        function updateTasksList(statusFilter = 'All') {
-            const list = document.getElementById('tasks-list');
-            if(!list) return;
-            list.innerHTML = '';
-            const filtered = db.tasks.filter(t => statusFilter === 'All' || t.status === statusFilter);
-            if(filtered.length === 0) {
-                list.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">ไม่มีรายการงาน</div>`;
-                return;
-            }
-            filtered.forEach(t => {
-                const isDone = t.status === 'Done';
-                list.innerHTML += `
-                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskStatus(${t.id})" class="accent-brand-500">
-                            <span class="text-xs ${isDone ? 'line-through text-slate-500' : 'text-slate-200'}">${t.title}</span>
-                        </div>
-                        <button onclick="deleteTask(${t.id})" class="text-slate-500 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                `;
-            });
-        }
-
-        function addTaskItem() {
-            const title = prompt('ชื่องาน:');
-            if(!title) return;
-            db.tasks.push({ id: Date.now(), title, status: 'Todo' });
-            saveDB();
-            updateTasksList();
-        }
-
-        function toggleTaskStatus(id) {
-            const task = db.tasks.find(t => t.id === id);
-            if(task) {
-                task.status = task.status === 'Todo' ? 'Done' : 'Todo';
-                saveDB();
-                updateTasksList();
-            }
-        }
-
-        function deleteTask(id) {
-            db.tasks = db.tasks.filter(t => t.id !== id);
-            saveDB();
-            updateTasksList();
-        }
-
-        function filterTaskStatus(status) { updateTasksList(status); }
-
-        // 4. CODE CENTER
-        function renderCodeCenterView(container) {
-            container.innerHTML = `
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-400">คลังเก็บโค้ดตัวอย่าง (Snippet Code)</span>
-                        <button onclick="addCodeItem()" class="bg-brand-600 hover:bg-brand-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium"><i class="fa-solid fa-plus mr-1"></i> เพิ่มโค้ด</button>
-                    </div>
-                    <div id="code-list" class="space-y-3"></div>
-                </div>
-            `;
-            updateCodeList();
-        }
-
-        function updateCodeList() {
-            const list = document.getElementById('code-list');
-            if(!list) return;
-            list.innerHTML = '';
-            if(db.codeCenter.length === 0) {
-                list.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">ยังไม่มี Code Snippet</div>`;
-                return;
-            }
-            db.codeCenter.forEach(c => {
-                list.innerHTML += `
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold text-xs text-brand-400">${c.title} (${c.lang})</span>
-                            <button onclick="deleteCode(${c.id})" class="text-slate-500 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                        <pre class="bg-slate-950 p-3 rounded-lg text-xs text-slate-300 overflow-x-auto font-mono"><code>${escapeHTML(c.code)}</code></pre>
-                    </div>
-                `;
-            });
-        }
-
-        function addCodeItem() {
-            const title = prompt('ชื่อหัวข้อโค้ด:');
-            if(!title) return;
-            const lang = prompt('ภาษา (เช่น JavaScript, HTML, Python):') || 'JavaScript';
-            const code = prompt('ชุดโค้ด:');
-            db.codeCenter.push({ id: Date.now(), title, lang, code: code || '' });
-            saveDB();
-            updateCodeList();
-        }
-
-        function deleteCode(id) {
-            db.codeCenter = db.codeCenter.filter(c => c.id !== id);
-            saveDB();
-            updateCodeList();
-        }
-
-        function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, 
-                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-            );
-        }
-
-        // 5. TOOLS (เครื่องมืออเนกประสงค์)
-        function renderToolsView(container) {
-            container.innerHTML = `
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3">
-                        <h4 class="font-bold text-xs text-brand-400"><i class="fa-solid fa-calculator mr-1"></i> เครื่องคิดเลขอย่างง่าย</h4>
-                        <input type="text" id="calc-input" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-right font-mono" placeholder="0">
-                        <button onclick="calculateResult()" class="w-full bg-brand-600 hover:bg-brand-500 text-white py-1.5 rounded text-xs">คำนวณ</button>
-                    </div>
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3">
-                        <h4 class="font-bold text-xs text-brand-400"><i class="fa-solid fa-key mr-1"></i> ตัวสร้างรหัสผ่านสุ่ม</h4>
-                        <div id="pass-output" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs font-mono text-slate-400">คลิกเพื่อสร้าง</div>
-                        <button onclick="generateRandomPass()" class="w-full bg-slate-800 hover:bg-slate-700 text-white py-1.5 rounded text-xs">สร้างรหัสผ่าน</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function calculateResult() {
             try {
-                const val = document.getElementById('calc-input').value;
-                document.getElementById('calc-input').value = eval(val);
-            } catch(e) {
-                showErrorToast('รูปแบบไม่ถูกต้อง');
-            }
-        }
+                // เปลี่ยนมาใช้โมเดล gemini-1.5-flash ที่เสถียรและรองรับการเรียกใช้งานทั่วไป
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }]
+                    })
+                });
 
-        function generateRandomPass() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$*';
-            let res = '';
-            for(let i=0; i<12; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
-            document.getElementById('pass-output').innerText = res;
-        }
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
 
-        // 6. SECURITY VIEW
-        function renderSecurityView(container) {
-            container.innerHTML = `
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl space-y-4 max-w-lg">
-                    <h3 class="font-bold text-sm"><i class="fa-solid fa-shield-halved text-brand-500 mr-2"></i> ศูนย์ความปลอดภัยระบบ</h3>
-                    <p class="text-xs text-slate-400">ข้อมูลทั้งหมดภายใน Hub ถูกเข้ารหัสด้วย Master Password ระดับ Local Storage ความปลอดภัยสูง</p>
-                    <div class="pt-2">
-                        <button onclick="triggerLock()" class="bg-red-600 hover:bg-red-500 text-white text-xs px-4 py-2 rounded font-medium"><i class="fa-solid fa-lock mr-1"></i> ล็อกหน้าจอทันที</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // 7. TRASH VIEW
-        function renderTrashView(container) {
-            container.innerHTML = `
-                <div class="space-y-4">
-                    <div class="text-xs text-slate-400">รายการที่ถูกลบชั่วคราว</div>
-                    <div id="trash-list" class="space-y-2"></div>
-                </div>
-            `;
-            const list = document.getElementById('trash-list');
-            if(db.trash.length === 0) {
-                list.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">ถังขยะว่างเปล่า</div>`;
-                return;
-            }
-            db.trash.forEach(t => {
-                list.innerHTML += `
-                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-xs">
-                        <span>${t.title} (ลบเมื่อ: ${t.deletedAt})</span>
-                        <button onclick="clearTrashItem(${t.id})" class="text-red-400 hover:underline">ลบถาวร</button>
+                const aiReply = data.candidates[0].content.parts[0].text;
+                
+                container.innerHTML = `
+                    <div class="bg-slate-900 border border-brand-500/30 p-3.5 rounded-xl space-y-2 text-slate-200">
+                        <div class="font-bold text-brand-400 flex items-center justify-between pb-2 border-b border-slate-800">
+                            <span><i class="fa-solid fa-sparkles mr-1"></i> ผลวิเคราะห์จาก Gemini AI</span>
+                            <span class="text-[10px] text-slate-500">สำเร็จ</span>
+                        </div>
+                        <div class="markdown-body space-y-2 text-[11px]">
+                            ${marked.parse(aiReply)}
+                        </div>
                     </div>
                 `;
-            });
-        }
+                statusDot.className = 'w-2 h-2 rounded-full bg-green-500';
+                showToast('AI ตรวจสอบโค้ดสำเร็จ!');
 
-        function clearTrashItem(id) {
-            db.trash = db.trash.filter(t => t.id !== id);
-            saveDB();
-            renderModuleContent('trash');
-        }
-
-        // --- GLOBAL SEARCH & COMMAND PALETTE ---
-        function openCommandPalette() { document.getElementById('cmd-palette').classList.remove('hidden'); document.getElementById('cmd-palette').classList.add('flex'); document.getElementById('cmd-input').focus(); }
-        function closeCommandPalette() { document.getElementById('cmd-palette').classList.add('hidden'); document.getElementById('cmd-palette').classList.remove('flex'); }
-        
-        window.addEventListener('keydown', (e) => {
-            if((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                openCommandPalette();
+            } catch (err) {
+                statusDot.className = 'w-2 h-2 rounded-full bg-red-500';
+                container.innerHTML = `<div class="bg-red-950/40 border border-red-900 p-3 rounded-xl text-red-300 text-[11px]">เกิดข้อผิดพลาด: ${err.message}</div>`;
+                showToast('เกิดข้อผิดพลาดในการเชื่อมต่อ API');
             }
-            if(e.key === 'Escape') closeCommandPalette();
-        });
-
-        function handleGlobalSearch(val) {
-            const results = document.getElementById('cmd-results');
-            if(!val) { results.innerHTML = `<div class="p-2 text-slate-500 text-center">พิมพ์คำค้นหาที่คุณต้องการ...</div>`; return; }
-            results.innerHTML = '';
-            const matches = db.vault.filter(v => v.title.toLowerCase().includes(val.toLowerCase()));
-            if(matches.length === 0) { results.innerHTML = `<div class="p-2 text-slate-500 text-center">ไม่พบผลการค้นหา</div>`; return; }
-            matches.forEach(m => {
-                results.innerHTML += `<div class="p-2 hover:bg-slate-800 rounded cursor-pointer text-slate-200">${m.title}</div>`;
-            });
         }
 
-        // --- SETTINGS & PLUGINS ---
-        function renderPluginToggles() {
-            const container = document.getElementById('plugin-toggles');
-            if(!container) return;
-            container.innerHTML = '';
-            for(let key in db.plugins) {
-                container.innerHTML += `
-                    <label class="flex items-center space-x-2 text-slate-300">
-                        <input type="checkbox" id="plugin-${key}" ${db.plugins[key] ? 'checked' : ''} class="accent-brand-500">
-                        <span class="capitalize">${key}</span>
-                    </label>
-                `;
-            }
-            document.getElementById('setting-hub-name').value = db.settings.hubName;
-        }
-
-        function saveSettings() {
-            db.settings.hubName = document.getElementById('setting-hub-name').value || 'Ultimate Hub V6';
-            for(let key in db.plugins) {
-                const el = document.getElementById(`plugin-${key}`);
-                if(el) db.plugins[key] = el.checked;
-            }
-            const newPass = document.getElementById('setting-new-pass').value;
-            if(newPass) db.auth.masterPass = newPass;
-            saveDB();
-            closeModal('settings-modal');
-            initApp();
-            showToast('บันทึกการตั้งค่าเรียบร้อย', 'success');
-        }
-
-        // --- HELPERS ---
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); if(id==='settings-modal') renderPluginToggles(); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
-        function showToast(msg, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `bg-slate-900 border ${type==='success'?'border-brand-500/50 text-brand-400':'border-slate-800 text-slate-200'} px-4 py-2 rounded-xl text-xs shadow-xl transition-all duration-300`;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
             toast.innerText = msg;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2500);
         }
-        function showErrorToast(msg) { showToast(msg, 'error'); }
     </script>
 </body>
 </html>
