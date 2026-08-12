@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniCode Studio Pro - AI ตรวจสอบโค้ด</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 
+                            50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 
+                            300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 
+                            600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 
+                            900: '#312e81'
+                        },
+                        success: '#10b981', warning: '#f59e0b', danger: '#ef4444'
+                    },
+                    fontFamily: {
+                        mono: ['Consolas', 'Monaco', 'monospace']
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-subtle': 'bounce 1s infinite'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked.js สำหรับแปลง Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js สำหรับไฮไลท์โค้ด -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/core.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans h-screen flex flex-col overflow-hidden select-none">
+
+    <!-- Topbar Header -->
+    <header class="h-16 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-30">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-br from-brand-500 to-brand-700 text-white p-2 rounded-xl font-bold shadow-lg shadow-brand-500/20">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-base tracking-tight">OmniCode Studio <span class="text-brand-400 text-sm">Pro</span></h1>
+                <p class="text-[10px] text-slate-400">ขับเคลื่อนด้วย Gemini AI</p>
+            </div>
+        </div>
+
+        <!-- ช่องใส่ API Key และปุ่มสั่งการ -->
+        <div class="flex items-center space-x-2 sm:space-x-3">
+            <div class="relative hidden sm:block">
+                <input type="password" id="api-key-input" placeholder="ใส่ Gemini API Key ที่นี่..." 
+                    class="bg-slate-950/80 border border-slate-700 text-sm rounded-xl px-3.5 py-2 text-slate-300 w-56 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-all">
+            </div>
+            <button onclick="clearAll()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl text-sm transition" title="ล้างทั้งหมด">
+                <i class="fa-solid fa-broom"></i>
+            </button>
+            <button onclick="analyzeWithRealAI()" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center space-x-2 shadow-lg shadow-brand-600/20">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span class="hidden sm:inline">ตรวจสอบโค้ด</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ส่วนเลือกภาษา -->
+    <div class="bg-slate-900/50 border-b border-slate-800 px-4 py-2 flex items-center justify-between shrink-0">
+        <div class="flex items-center space-x-2">
+            <label class="text-xs text-slate-400">ภาษา:</label>
+            <select id="lang-selector" class="bg-slate-950 border border-slate-800 text-sm rounded-lg px-2.5 py-1.5 text-slate-300 focus:outline-none focus:border-brand-500">
+                <option value="lua">Lua / Roblox Luau</option>
+                <option value="javascript">JavaScript / Node.js</option>
+                <option value="html">HTML / CSS</option>
+                <option value="python">Python</option>
+                <option value="cpp">C / C++</option>
+                <option value="java">Java</option>
+                <option value="csharp">C#</option>
+                <option value="php">PHP</option>
+                <option value="sql">SQL</option>
+                <option value="rust">Rust</option>
+                <option value="go">Go</option>
+            </select>
+            <button onclick="loadExample()" class="text-xs text-brand-400 hover:text-brand-300 underline">
+                <i class="fa-solid fa-code mr-1"></i>โหลดตัวอย่าง
+            </button>
+        </div>
+        <div class="flex items-center space-x-2 text-xs text-slate-400">
+            <span id="char-count">0 ตัวอักษร</span>
+            <div class="w-2 h-2 rounded-full bg-slate-600" id="ai-status-dot"></div>
+        </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-5 h-[calc(100vh-104px)] overflow-hidden">
+        
+        <!-- Editor Section -->
+        <div class="lg:col-span-2 flex flex-col h-full border-r border-slate-800 bg-slate-900/30">
+            <div class="bg-slate-950/80 px-4 py-2 text-sm font-semibold text-slate-300 flex items-center justify-between shrink-0 border-b border-slate-800">
+                <span><i class="fa-solid fa-file-code mr-2 text-brand-400"></i>โค้ดของคุณ</span>
+            </div>
+            <textarea id="code-textarea" 
+                class="flex-1 bg-slate-900/50 p-4 font-mono text-sm text-slate-200 resize-none focus:outline-none leading-relaxed border-0" 
+                placeholder="📋 วางหรือพิมพ์โค้ดที่นี่...
+- เลือกภาษาที่เขียน
+- กดปุ่ม ตรวจสอบโค้ด ด้านบน
+- รับคำแนะนำจาก AI ทางขวา"></textarea>
+        </div>
+
+        <!-- AI Advisor Panel -->
+        <div class="lg:col-span-3 flex flex-col h-full bg-slate-950/50">
+            <div class="bg-slate-900/80 px-4 py-2 text-sm font-semibold text-brand-400 flex items-center justify-between shrink-0 border-b border-slate-800">
+                <span><i class="fa-solid fa-robot mr-2"></i>ผลวิเคราะห์จาก AI</span>
+                <div class="flex items-center space-x-2">
+                    <button onclick="copyResult()" class="text-xs text-slate-400 hover:text-white transition" title="คัดลอกผลลัพธ์">
+                        <i class="fa-solid fa-copy"></i> คัดลอก
+                    </button>
+                    <button onclick="clearResult()" class="text-xs text-slate-400 hover:text-danger transition" title="ล้างผลลัพธ์">
+                        <i class="fa-solid fa-eraser"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="ai-feedback-container" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm leading-relaxed">
+                <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl text-slate-300">
+                    <div class="font-bold text-brand-400 mb-3 text-lg"><i class="fa-solid fa-circle-info mr-2"></i>วิธีใช้งาน</div>
+                    <ol class="list-decimal list-inside space-y-2 text-slate-400">
+                        <li>ไปที่ <span class="text-brand-300">Google AI Studio</span> เพื่อสร้าง API Key ฟรี</li>
+                        <li>นำ API Key มาใส่ที่ช่องด้านบน</li>
+                        <li>เลือกภาษาที่ต้องการตรวจสอบ</li>
+                        <li>วางโค้ดลงในช่องด้านซ้าย</li>
+                        <li>กดปุ่ม <span class="text-brand-300">ตรวจสอบโค้ด</span> เพื่อเริ่มทำงาน</li>
+                    </ol>
+                    <div class="mt-3 p-2 bg-brand-900/20 rounded-lg text-xs text-brand-200">
+                        💡 ใช้โมเดล: <code class="bg-brand-900/40 px-1 rounded">gemini-2.0-flash</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast แจ้งเตือน -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900/95 border border-slate-700 text-slate-200 px-5 py-3 rounded-2xl shadow-2xl text-sm transition-all duration-300 opacity-0 translate-y-4 pointer-events-none z-50 max-w-sm"></div>
+
+    <!-- Script ตรรกะการทำงาน -->
+    <script>
+        // โหลดค่าที่บันทึกไว้
+        const apiKeyInput = document.getElementById('api-key-input');
+        const savedKey = localStorage.getItem('gemini_api_key');
+        if (savedKey) apiKeyInput.value = savedKey;
+        apiKeyInput.addEventListener('input', () => {
+            localStorage.setItem('gemini_api_key', apiKeyInput.value.trim());
+        });
+
+        // นับจำนวนตัวอักษร
+        const codeArea = document.getElementById('code-textarea');
+        codeArea.addEventListener('input', () => {
+            document.getElementById('char-count').textContent = `${codeArea.value.length} ตัวอักษร`;
+        });
+
+        // ตัวอย่างโค้ดแยกตามภาษา
+        const examples = {
+            lua: `-- ตัวอย่างโค้ด Lua / Roblox
+local Players = game:GetService("Players")
+
+local function onPlayerAdded(player)
+    print("ผู้เล่นเข้ามา: " .. player.Name)
+    
+    -- สร้างข้อความต้อนรับ
+    local leaderstats = Instance.new("Folder")
+    leaderstats.Name = "leaderstats"
+    leaderstats.Parent = player
+end
+
+Players.PlayerAdded:Connect(onPlayerAdded)`,
+            javascript: `// ตัวอย่างโค้ด JavaScript
+function calculateTotal(prices) {
+    let total = 0;
+    for (let i = 0; i < prices.length; i++) {
+        total += prices[i];
+    }
+    return total;
+}
+
+const items = [100, 200, 300];
+console.log("ราคารวม:", calculateTotal(items));`,
+            python: `# ตัวอย่างโค้ด Python
+def หาผลรวม(รายการ):
+    ผลรวม = sum(รายการ)
+    return ผลรวม
+
+ข้อมูล = [10, 20, 30, 40]
+ผลลัพธ์ = หาผลรวม(ข้อมูล)
+print(f"ผลรวมคือ: {ผลลัพธ์}")`
+        };
+
+        // โหลดตัวอย่าง
+        function loadExample() {
+            const lang = document.getElementById('lang-selector').value;
+            codeArea.value = examples[lang] || examples['lua'];
+            document.getElementById('char-count').textContent = `${codeArea.value.length} ตัวอักษร`;
+            showToast('โหลดตัวอย่างเรียบร้อย ✅', 'success');
+        }
+
+        // ล้างทุกอย่าง
+        function clearAll() {
+            codeArea.value = '';
+            document.getElementById('char-count').textContent = '0 ตัวอักษร';
+            clearResult();
+            showToast('ล้างข้อมูลเรียบร้อย', 'warning');
+        }
+
+        // ล้างเฉพาะผลลัพธ์
+        function clearResult() {
+            document.getElementById('ai-feedback-container').innerHTML = `
+                <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl text-slate-300">
+                    <p class="text-slate-400">ผลการวิเคราะห์จะแสดงที่นี่...</p>
+                </div>`;
+        }
+
+        // คัดลอกผลลัพธ์
+        function copyResult() {
+            const container = document.getElementById('ai-feedback-container');
+            navigator.clipboard.writeText(container.innerText)
+                .then(() => showToast('คัดลอกสำเร็จ ✅', 'success'))
+                .catch(() => showToast('ไม่สามารถคัดลอกได้', 'danger'));
+        }
+
+        // ฟังก์ชันหลัก ตรวจสอบโค้ดด้วย AI
+        async function analyzeWithRealAI() {
+            const apiKey = apiKeyInput.value.trim();
+            const code = codeArea.value.trim();
+            const lang = document.getElementById('lang-selector').value;
+            const container = document.getElementById('ai-feedback-container');
+            const statusDot = document.getElementById('ai-status-dot');
+
+            // ตรวจสอบข้อมูล
+            if (!apiKey) {
+                showToast('กรุณาใส่ Gemini API Key ก่อนครับ', 'warning');
+                apiKeyInput.focus();
+                return;
+            }
+            if (!code) {
+                showToast('กรุณาใส่โค้ดที่ต้องการตรวจสอบครับ', 'warning');
+                codeArea.focus();
+                return;
+            }
+
+            // กำลังประมวลผล
+            showToast('🔍 AI กำลังวิเคราะห์...', 'success');
+            statusDot.className = 'w-2.5 h-2.5 rounded-full bg-yellow-500 animate-pulse';
+            container.innerHTML = `
+                <div class="bg-slate-900/80 border border-brand-500/30 p-4 rounded-2xl text-slate-400">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-spinner fa-spin text-brand-400"></i>
+                        <span>กำลังวิเคราะห์โค้ดด้วย AI...</span>
+                    </div>
+                </div>`;
+
+            // คำสั่งให้ AI ทำงาน
+            const promptText = `คุณคือผู้เชี่ยวชาญตรวจสอบและปรับปรุงโค้ด ภาษา: ${lang.toUpperCase()}
+กรุณาตรวจสอบโค้ดด้านล่างอย่างละเอียด:
+
+\`\`\`${lang}
+${code}
+\`\`\`
+
+ตอบกลับเป็นภาษาไทยที่เข้าใจง่าย แบ่งหัวข้อชัดเจนดังนี้:
+
+🔴 **ปัญหาและสิ่งที่ต้องแก้ไขทันที**
+- ระบุปัญหาและบรรทัดที่เกิด
+- เหตุผลที่เป็นปัญหา และวิธีแก้ไข
+
+🟡 **จุดที่ควรปรับปรุงให้ดีขึ้น**
+- ข้อเสนอแนะเพิ่มเติม
+- รูปแบบการเขียนและประสิทธิภาพ
+
+🟢 **ส่วนที่ทำได้ดีแล้ว**
+- ยกย่องจุดดีของโค้ด
+
+💡 **โค้ดที่ปรับปรุงแล้ว**
+\`\`\`${lang}
+[ใส่โค้ดฉบับปรับปรุงที่นี่]
+\`\`\`
+
+สรุปสั้นๆ ท้ายสุดว่าควรทำอะไรบ้าง`;
+
+            try {
+                // เรียกใช้โมเดลที่ใช้งานได้จริง gemini-2.0-flash
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }],
+                        generationConfig: {
+                            temperature: 0.2,
+                            maxOutputTokens: 8192
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
+
+                // ดึงข้อความตอบกลับ
+                const aiReply = data.candidates[0].content.parts[0].text;
+                
+                // แสดงผล
+                container.innerHTML = `
+                    <div class="bg-slate-900/80 border border-brand-500/30 p-4 rounded-2xl space-y-3 text-slate-200">
+                        <div class="font-bold text-brand-400 flex items-center justify-between pb-2 border-b border-slate-800">
+                            <span><i class="fa-solid fa-sparkles mr-2"></i>ผลวิเคราะห์จาก Gemini AI</span>
+                            <span class="text-xs bg-success/20 text-success px-2 py-0.5 rounded-full">สำเร็จ</span>
+                        </div>
+                        <div class="markdown-body space-y-4 text-sm">
+                            ${marked.parse(aiReply)}
+                        </div>
+                    </div>`;
+                
+                // ไฮไลท์โค้ด
+                container.querySelectorAll('pre code').forEach(block => {
+                    hljs.highlightElement(block);
+                });
+
+                statusDot.className = 'w-2.5 h-2.5 rounded-full bg-success';
+                showToast('✅ ตรวจสอบเสร็จสิ้น!', 'success');
+
+            } catch (err) {
+                console.error(err);
+                statusDot.className = 'w-2.5 h-2.5 rounded-full bg-danger';
+                container.innerHTML = `
+                    <div class="bg-red-950/40 border border-red-900/80 p-4 rounded-2xl text-red-300">
+                        <div class="font-bold mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>เกิดข้อผิดพลาด</div>
+                        <p class="mb-3">${err.message}</p>
+                        <div class="text-sm text-red-200 bg-red-900/30 p-3 rounded-lg">
+                            <strong>สิ่งที่ควรตรวจสอบ:</strong>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>API Key ถูกต้องและยังไม่หมดอายุหรือไม่</li>
+                                <li>เปิดใช้งาน API ในบัญชี Google แล้วหรือยัง</li>
+                                <li>ไม่ได้ใช้เกินโควต้าการใช้งานฟรี</li>
+                            </ul>
+                        </div>
+                    </div>`;
+                showToast('❌ ผิดพลาด: ' + err.message, 'danger');
+            }
+        }
+
+        // แสดงข้อความแจ้งเตือน
+        function showToast(msg, type = 'info') {
+            const toast = document.getElementById('toast');
+            const colors = {
+                success: 'border-success/50 bg-success/10 text-green-200',
+                warning: 'border-warning/50 bg-warning/10 text-amber-200',
+                danger: 'border-danger/50 bg-danger/10 text-red-200',
+                info: 'border-brand-500/50 bg-brand-500/10 text-blue-200'
+            };
+            toast.className = `fixed bottom-6 right-6 ${colors[type]} px-5 py-3 rounded-2xl shadow-2xl text-sm transition-all duration-300 translate-y-0 z-50 max-w-sm`;
+            toast.innerText = msg;
+            toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+            }, 4000);
+        }
+    </script>
+
+    <style>
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { margin-top: 1.2em; margin-bottom: 0.5em; font-weight: bold; }
+        .markdown-body h2 { font-size: 1.1em; color: #a5b4fc; }
+        .markdown-body pre { background: #1e293b; border-radius: 0.75rem; padding: 1rem; margin: 0.75rem 0; overflow-x: auto; }
+        .markdown-body code { font-family: Consolas, monospace; font-size: 0.9em; }
+        .markdown-body p { margin: 0.5em 0; line-height: 1.7; }
+        .markdown-body ul, .markdown-body ol { padding-left: 1.5em; margin: 0.5em 0; }
+        .markdown-body li { margin: 0.3em 0; }
+    </style>
+</body>
+</html>
