@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทดสอบระบบ - เว็บง่ายๆ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+
+        body {
+            background-color: #f0f9ff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #2563eb;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .status-box {
+            background-color: #dcfce7;
+            color: #166534;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .btn {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ ทดสอบระบบสำเร็จ</h1>
+        <p>ถ้าเห็นหน้านี้ แสดงว่าโค้ดทำงานได้ปกติครับ</p>
+
+        <div class="status-box">
+            ระบบทำงานได้ปกติ ✔️
+        </div>
+
+        <button class="btn" onclick="testClick()">กดทดสอบการทำงาน</button>
+
+        <div id="result">
+            คลิกทำงานแล้วเมื่อ: <span id="time"></span>
+        </div>
+    </div>
+
+    <script>
+        function testClick() {
+            const resultDiv = document.getElementById('result');
+            const timeSpan = document.getElementById('time');
+            const now = new Date();
+            timeSpan.textContent = now.toLocaleTimeString('th-TH');
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
