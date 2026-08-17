@@ -3,339 +3,429 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Cloud - Enterprise Web Generator</title>
+    <title>Nexus Omega V8 - Quantum Infinity Hyper-Engine</title>
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: rgba(17, 24, 39, 0.7);
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --accent: #10b981;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --border: rgba(255, 255, 255, 0.1);
+            --bg-color: #030407;
+            --panel-bg: #0b0f17;
+            --border-color: #21262d;
+            --accent-color: #238636;
+            --accent-hover: #2ea043;
+            --text-color: #c9d1d9;
+            --text-muted: #8b949e;
+            --danger-color: #da3633;
+            --primary-glow: #1f6feb;
+            --warning-color: #d29922;
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        
+        header { background-color: var(--panel-bg); border-bottom: 1px solid var(--border-color); padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.8); z-index: 10; }
+        header h1 { font-size: 1.25rem; color: #58a6ff; display: flex; align-items: center; gap: 10px; text-shadow: 0 0 12px rgba(88,166,255,0.5); }
+        
+        .main-layout { display: grid; grid-template-columns: 380px 1fr 420px; flex: 1; height: calc(100vh - 60px); }
+        @media (max-width: 1200px) { .main-layout { grid-template-columns: 1fr; height: auto; } }
 
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-color) 70%);
-        }
+        /* Sidebar Left: Config & Files */
+        .sidebar-left { background-color: #07090e; border-right: 1px solid var(--border-color); padding: 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+        
+        /* Center: Editor & Injectors */
+        .center-editor { background-color: var(--panel-bg); display: flex; flex-direction: column; border-right: 1px solid var(--border-color); padding: 15px; gap: 12px; overflow-y: auto; }
+        
+        /* Sidebar Right: Preview & Terminal */
+        .sidebar-right { background-color: #000; display: flex; flex-direction: column; }
 
-        .container {
-            width: 100%;
-            max-width: 680px;
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
+        .group { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 0.8rem; font-weight: bold; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+        input, textarea, select { background: #020408; border: 1px solid var(--border-color); color: var(--text-color); padding: 8px 10px; border-radius: 6px; font-size: 0.85rem; transition: all 0.3s; }
+        input:focus, textarea:focus, select:focus { border-color: var(--primary-glow); outline: none; box-shadow: 0 0 8px rgba(31,111,235,0.4); }
+        textarea { resize: vertical; height: 180px; font-family: 'Fira Code', monospace; font-size: 0.8rem; }
 
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
+        .file-tabs { display: flex; gap: 4px; background: #020408; padding: 4px; border-radius: 6px; border: 1px solid var(--border-color); }
+        .file-tab { flex: 1; background: transparent; border: none; color: var(--text-muted); padding: 6px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; text-align: center; transition: all 0.2s; }
+        .file-tab.active { background: var(--border-color); color: #fff; font-weight: bold; }
 
-        .header h2 {
-            margin: 0;
-            font-size: 26px;
-            background: linear-gradient(135deg, #818cf8, #34d399);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .presets { display: flex; gap: 4px; flex-wrap: wrap; }
+        .preset-btn { background: #161b22; border: 1px solid var(--border-color); color: var(--text-color); padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; transition: background 0.2s; }
+        .preset-btn:hover { background: #30363d; }
 
-        .header p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-top: 5px;
-        }
+        .btn-main { background-color: var(--accent-color); color: white; border: none; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(35,134,54,0.3); text-align: center; }
+        .btn-main:hover { background-color: var(--accent-hover); }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .btn-sub { background: #161b22; border: 1px solid var(--border-color); color: #58a6ff; padding: 6px 10px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s; text-align: center; }
+        .btn-sub:hover { background: #30363d; }
 
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-size: 0.7rem; color: var(--text-muted); background: #020408; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); text-align: center; }
+        .stats-grid div span { display: block; color: #fff; font-weight: bold; font-size: 0.8rem; }
 
-        input, textarea {
-            width: 100%;
-            background: rgba(3, 7, 18, 0.6);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px 16px;
-            color: white;
-            font-size: 14px;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-            font-family: monospace;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-
-        textarea {
-            height: 180px;
-            resize: vertical;
-        }
-
-        .btn-deploy {
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-deploy:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
-        }
-
-        .btn-deploy:disabled {
-            background: #374151;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
-        /* ส่วนแสดงสถานะการสแกนและโหลด */
-        #console-box {
-            display: none;
-            margin-top: 25px;
-            background: #030712;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
-            font-family: monospace;
-            font-size: 13px;
-        }
-
-        .console-line {
-            margin: 6px 0;
-            display: flex;
-            align-items: center;
-            color: var(--text-muted);
-        }
-
-        .console-line.active { color: #fbbf24; }
-        .console-line.success { color: var(--accent); }
-        .console-line.error { color: #f87171; }
-
-        /* ผลลัพธ์ลิงก์ */
-        #result-card {
-            display: none;
-            margin-top: 25px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        #result-card h3 {
-            margin: 0 0 10px 0;
-            color: var(--accent);
-            font-size: 18px;
-        }
-
-        .link-box {
-            background: rgba(3, 7, 18, 0.8);
-            padding: 10px;
-            border-radius: 6px;
-            word-break: break-all;
-            font-family: monospace;
-            font-size: 13px;
-            margin-bottom: 15px;
-            color: #34d399;
-        }
-
-        .btn-action {
-            display: inline-block;
-            background: var(--accent);
-            color: #030712;
-            padding: 10px 20px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
-            margin-right: 5px;
-            transition: opacity 0.2s;
-        }
-
-        .btn-action:hover { opacity: 0.9; }
+        .logs-container { background: #020408; border: 1px solid var(--border-color); padding: 8px; border-radius: 6px; font-family: monospace; font-size: 0.75rem; height: 110px; overflow-y: auto; color: #3fb950; }
+        
+        .preview-header { background: var(--panel-bg); padding: 10px 15px; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+        iframe { flex: 1; width: 100%; border: none; background: #fff; }
+        
+        .injector-box { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .injector-box textarea { height: 90px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <h2>🚀 NEXUS CLOUD ENGINE</h2>
-            <p>ระบบแปลงโค้ดดิบเป็นเว็บไซต์ระดับสากลแบบอัตโนมัติ</p>
+    <header>
+        <h1>⚡ Nexus Omega V8 <span style="font-size: 0.6rem; background: #1f6feb; padding: 2px 8px; border-radius: 10px; color: #fff;">QUANTUM INFINITY</span></h1>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="themeSelector" onchange="changeTheme()" style="padding: 4px 8px; font-size: 0.75rem;">
+                <option value="dark">ธีม: ดาร์กคลาสสิก</option>
+                <option value="matrix">ธีม: เมทริกซ์เขียวมรกต</option>
+                <option value="cyber">ธีม: ไซเบอร์พังก์พิงค์</option>
+            </select>
         </div>
-        
-        <div class="form-group">
-            <label>GitHub Personal Token</label>
-            <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx">
+    </header>
+
+    <div class="main-layout">
+        <!-- ฝั่งซ้าย: ตั้งค่าระบบ & บัญชี -->
+        <div class="sidebar-left">
+            <div class="group">
+                <label>GITHUB ACCESS TOKEN <span style="color: #58a6ff; cursor: pointer;" onclick="toggleTokenMask()">สลับซ่อน/แสดง</span></label>
+                <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" oninput="autoSaveData()">
+            </div>
+
+            <div class="group">
+                <label>REPOSITORY TARGET</label>
+                <input type="text" id="repo" value="hfutposhdhehheh-source/my-web-builder" oninput="autoSaveData()">
+            </div>
+
+            <div class="group">
+                <label>ชื่อไฟล์เป้าหมายหลัก (.html) <span style="color: #58a6ff; cursor: pointer;" onclick="randomFileName()">🎲 สุ่มชื่อ</span></label>
+                <input type="text" id="filename" placeholder="index.html" oninput="autoSaveData()">
+            </div>
+
+            <div class="group">
+                <label>ข้อความ Commit Message</label>
+                <input type="text" id="commitMsg" value="Update via Nexus Omega V8 Hyper-Engine" oninput="autoSaveData()">
+            </div>
+
+            <hr style="border-color: var(--border-color);">
+
+            <div class="group">
+                <label>📁 จำลองระบบโครงสร้างไฟล์ย่อย</label>
+                <div class="file-tabs">
+                    <button class="file-tab active" onclick="switchFileTab('main')">index.html</button>
+                    <button class="file-tab" onclick="switchFileTab('style')">style.css</button>
+                    <button class="file-tab" onclick="switchFileTab('script')">app.js</button>
+                </div>
+            </div>
+
+            <div class="group">
+                <label>ประวัติการ Deploy ล่าสุด</label>
+                <div id="deployHistory" style="background: #020408; border: 1px solid var(--border-color); padding: 8px; border-radius: 6px; font-size: 0.75rem; color: var(--text-muted); max-height: 90px; overflow-y: auto;">
+                    ยังไม่มีประวัติการ Deploy ในเซสชันนี้
+                </div>
+            </div>
+
+            <button class="btn-sub" onclick="exportProjectZip()">📦 สำรองข้อมูลโปรเจกต์ (JSON)</button>
         </div>
 
-        <div class="form-group">
-            <label>Deployment Filename (.html)</label>
-            <input type="text" id="file-name" placeholder="index-pro.html">
+        <!-- ตรงกลาง: โค้ดหลัก และ Injector -->
+        <div class="center-editor">
+            <div class="group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label>โค้ดหลัก (Source Editor)</label>
+                    <div class="presets">
+                        <button class="preset-btn" onclick="loadPreset('basic')">พื้นฐาน</button>
+                        <button class="preset-btn" onclick="loadPreset('troll')">ปั่น: เตือนภัย</button>
+                        <button class="preset-btn" onclick="loadPreset('matrix')">ปั่น: เมทริกซ์</button>
+                    </div>
+                </div>
+                <textarea id="code" placeholder="เขียนโค้ด HTML ที่นี่..." oninput="triggerLiveUpdate(); autoSaveData();"></textarea>
+                
+                <div class="stats-grid">
+                    <div>ตัวอักษร<span id="charCount">0</span></div>
+                    <div>บรรทัด<span id="lineCount">0</span></div>
+                    <div>ขนาดไฟล์<span id="fileSize">0 KB</span></div>
+                </div>
+            </div>
+
+            <!-- เพิ่มช่อง Custom Injector ด่วน -->
+            <div class="group">
+                <label>⚡ Quick Injector (แทรกโค้ดเสริมแบบเร่งด่วน)</label>
+                <div class="injector-box">
+                    <textarea id="extraCSS" placeholder="Custom CSS เพิ่มเติม..." oninput="triggerLiveUpdate()"></textarea>
+                    <textarea id="extraJS" placeholder="Custom JS เพิ่มเติม..." oninput="triggerLiveUpdate()"></textarea>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-sub" style="flex: 1;" onclick="formatCode()">✨ จัดรูปทรงโค้ด</button>
+                <button class="btn-sub" style="flex: 1; color: var(--danger-color);" onclick="clearAllData()">🗑️ ล้างทั้งหมด</button>
+            </div>
+
+            <button class="btn-main" onclick="startQuantumDeploy()">🚀 เริ่มต้น Deploy ระบบ Quantum V8</button>
+
+            <div id="resultBox" style="display: none; background: #0f172a; border: 1px solid #1f6feb; padding: 10px; border-radius: 6px; gap: 6px; flex-direction: column;">
+                <label style="color: #58a6ff; font-size: 0.75rem;">🔗 ลิงก์เว็บไซต์คลาวด์ของคุณ:</label>
+                <div style="display: flex; gap: 6px;">
+                    <input type="text" id="resultLink" readonly style="background: #000; font-size: 0.75rem; flex: 1;">
+                    <button class="btn-sub" onclick="copyLink()">คัดลอก</button>
+                </div>
+            </div>
+
+            <div class="group">
+                <label>ระบบบันทึกเหตุการณ์ (Terminal Logs) <span style="color: var(--danger-color); cursor: pointer;" onclick="clearLogs()">ล้าง</span></label>
+                <div id="logs" class="logs-container">> [SYSTEM V8] แพลตฟอร์มพร้อมปฏิบัติการ...</div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label>Raw Source Code (HTML/CSS/JS)</label>
-            <textarea id="code-input" placeholder="<!DOCTYPE html>..."></textarea>
-        </div>
-
-        <button id="deploy-btn" class="btn-deploy" onclick="startDeployment()">เริ่มต้นกระบวนการ Deploy</button>
-
-        <!-- หน้าต่างจำลองคอนโซลสแกนโค้ด -->
-        <div id="console-box">
-            <div id="step-1" class="console-line">⏳ [01] กำลังวิเคราะห์โครงสร้างโค้ดดิบ (Syntax Analysis)...</div>
-            <div id="step-2" class="console-line" style="opacity: 0.4;">⏳ [02] ระบบความปลอดภัย: ตรวจสอบช่องโหว่ XSS & Malicious Injection...</div>
-            <div id="step-3" class="console-line" style="opacity: 0.4;">⏳ [03] เข้ารหัสข้อมูลแพ็กเกจ (Base64 Cloud Transmission)...</div>
-            <div id="step-4" class="console-line" style="opacity: 0.4;">⏳ [04] กำลังส่งสัญญาณสร้างไฟล์ไปยัง GitHub Repository...</div>
-        </div>
-
-        <!-- กล่องแสดงลิงก์สำเร็จ -->
-        <div id="result-card">
-            <h3>🎉 เผยแพร่เว็บไซต์สำเร็จสมบูรณ์แบบ!</h3>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">ลิงก์ถาวรของคุณพร้อมใช้งานทั่วโลกแล้ว:</p>
-            <div class="link-box" id="link-text">https://...</div>
-            <a id="visit-btn" class="btn-action" href="#" target="_blank">🌐 เปิดเว็บไซต์</a>
-            <button class="btn-action" style="background:#4b5563; color:white; border:none; cursor:pointer;" onclick="copyLink()">📋 คัดลอกลิงก์</button>
+        <!-- ฝั่งขวา: พรีวิวสดแบบเรียลไทม์ -->
+        <div class="sidebar-right">
+            <div class="preview-header">
+                <span>🖥️ Quantum Live Preview</span>
+                <button class="btn-sub" onclick="triggerLiveUpdate()">🔄 รีเฟรช</button>
+            </div>
+            <iframe id="previewFrame"></iframe>
         </div>
     </div>
 
     <script>
-        const username = "hfutposhdhehheh-source"; 
-        const repo = "my-web-builder";
+        let currentTab = 'main';
+        let fileStorage = { main: '', style: '', script: '' };
 
-        async function startDeployment() {
-            const token = document.getElementById('gh-token').value;
-            let filename = document.getElementById('file-name').value;
-            const code = document.getElementById('code-input').value;
-            const btn = document.getElementById('deploy-btn');
-            const consoleBox = document.getElementById('console-box');
-            const resultCard = document.getElementById('result-card');
+        function log(msg) {
+            const box = document.getElementById('logs');
+            box.innerHTML += `<br>> ${msg}`;
+            box.scrollTop = box.scrollHeight;
+        }
 
-            if(!token || !filename || !code) {
-                alert("⚠️ กรุณากรอกข้อมูลให้ครบทุกช่องในระบบ!");
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = "> [SYSTEM V8] ล้างประวัติ Terminal เรียบร้อย";
+        }
+
+        function switchFileTab(tab) {
+            // บันทึกค่าปัจจุบันก่อนเปลี่ยนแท็บ
+            fileStorage[currentTab] = document.getElementById('code').value;
+            currentTab = tab;
+            
+            // เปลี่ยนสถานะปุ่มแท็บ
+            document.querySelectorAll('.file-tab').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // โหลดข้อมูลของแท็บนั้นๆ มาแสดง
+            document.getElementById('code').value = fileStorage[currentTab] || '';
+            triggerLiveUpdate();
+            log(`สลับไปแก้ไขไฟล์: ${tab === 'main' ? 'index.html' : tab === 'style' ? 'style.css' : 'app.js'}`);
+        }
+
+        function triggerLiveUpdate() {
+            fileStorage[currentTab] = document.getElementById('code').value;
+            const htmlCode = fileStorage['main'] || '';
+            const cssInject = document.getElementById('extraCSS').value;
+            const jsInject = document.getElementById('extraJS').value;
+
+            // คำนวณสถิติ
+            const chars = htmlCode.length;
+            const lines = htmlCode.split('\n').length;
+            const kb = (new Blob([htmlCode]).size / 1024).toFixed(2);
+            document.getElementById('charCount').innerText = chars;
+            document.getElementById('lineCount').innerText = lines;
+            document.getElementById('fileSize').innerText = `${kb} KB`;
+
+            // ประกอบร่างโค้ดเข้า Iframe
+            const iframe = document.getElementById('previewFrame');
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open();
+            doc.write(`
+                ${htmlCode}
+                <style>${cssInject}</style>
+                <script>${jsInject}<\/script>
+            `);
+            doc.close();
+        }
+
+        function toggleTokenMask() {
+            const t = document.getElementById('token');
+            t.type = t.type === 'password' ? 'text' : 'password';
+        }
+
+        function randomFileName() {
+            const names = ['quantum-index', 'matrix-portal', 'hyper-engine', 'cyber-nexus', 'omega-main'];
+            const rand = names[Math.floor(Math.random() * names.length)] + '-' + Math.floor(Math.random() * 8999 + 1000) + '.html';
+            document.getElementById('filename').value = rand;
+            autoSaveData();
+            log(`สุ่มชื่อไฟล์ใหม่: ${rand}`);
+        }
+
+        function clearAllData() {
+            if(confirm("ต้องการล้างข้อมูลทั้งหมดในระบบ V8 ใช่หรือไม่?")) {
+                localStorage.clear();
+                fileStorage = { main: '', style: '', script: '' };
+                document.getElementById('code').value = '';
+                document.getElementById('extraCSS').value = '';
+                document.getElementById('extraJS').value = '';
+                triggerLiveUpdate();
+                log("ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว");
+            }
+        }
+
+        function formatCode() {
+            let code = document.getElementById('code').value;
+            if(!code) return;
+            document.getElementById('code').value = code.trim();
+            triggerLiveUpdate();
+            log("จัดระเบียบโครงสร้างโค้ดสำเร็จ");
+        }
+
+        function changeTheme() {
+            const theme = document.getElementById('themeSelector').value;
+            const root = document.documentElement;
+            if(theme === 'matrix') {
+                root.style.setProperty('--bg-color', '#020602');
+                root.style.setProperty('--panel-bg', '#050f05');
+                root.style.setProperty('--primary-glow', '#00ff66');
+            } else if(theme === 'cyber') {
+                root.style.setProperty('--bg-color', '#09020e');
+                root.style.setProperty('--panel-bg', '#140424');
+                root.style.setProperty('--primary-glow', '#ff007f');
+            } else {
+                root.style.setProperty('--bg-color', '#030407');
+                root.style.setProperty('--panel-bg', '#0b0f17');
+                root.style.setProperty('--primary-glow', '#1f6feb');
+            }
+            log(`เปลี่ยนธีมเป็น: ${theme}`);
+        }
+
+        function loadPreset(type) {
+            let sample = "";
+            if(type === 'basic') {
+                sample = `<!DOCTYPE html>\n<html lang="th">\n<head>\n<meta charset="UTF-8">\n<title>Nexus Omega V8</title>\n</head>\n<body style="background:#0b0f17; color:#fff; text-align:center; padding-top:25vh;">\n<h1>⚡ ยินดีต้อนรับสู่ Nexus Omega V8</h1>\n<p>สุดยอดระบบคลาวด์เว็บ บิลเดอร์</p>\n</body>\n</html>`;
+            } else if(type === 'troll') {
+                sample = `<!DOCTYPE html>\n<html lang="th">\n<head>\n<meta charset="UTF-8">\n<title>System Alert</title>\n</head>\n<body style="background:#8b0000; color:white; text-align:center; padding-top:30vh;" onclick="alert('โดนแกล้งแล้วนะ ฮ่าๆๆ!')">\n<h1>🚨 ตรวจพบความผิดปกติของระบบ!</h1>\n<p>คลิกหน้าจอเพื่อแก้ไขข้อผิดพลาด...</p>\n</body>\n</html>`;
+            } else if(type === 'matrix') {
+                sample = `<!DOCTYPE html>\n<html lang="th">\n<head>\n<meta charset="UTF-8">\n<title>Matrix Stream</title>\n</head>\n<body style="background:#000; color:#00ff66; text-align:center; padding-top:30vh;">\n<h1>🟢 เข้าสู่ระบบเครือข่ายเมทริกซ์ V8</h1>\n<p>ข้อมูลทั้งหมดถูกเข้ารหัสเรียบร้อยแล้ว</p>\n</body>\n</html>`;
+            }
+            document.getElementById('code').value = sample;
+            fileStorage[currentTab] = sample;
+            triggerLiveUpdate();
+            autoSaveData();
+            log(`โหลดเทมเพลตสำเร็จ: ${type}`);
+        }
+
+        function autoSaveData() {
+            localStorage.setItem('v8_token', document.getElementById('token').value);
+            localStorage.setItem('v8_repo', document.getElementById('repo').value);
+            localStorage.setItem('v8_filename', document.getElementById('filename').value);
+            localStorage.setItem('v8_commit', document.getElementById('commitMsg').value);
+            localStorage.setItem('v8_files', JSON.stringify(fileStorage));
+        }
+
+        function loadSavedData() {
+            if(localStorage.getItem('v8_token')) {
+                document.getElementById('token').value = localStorage.getItem('v8_token');
+                document.getElementById('repo').value = localStorage.getItem('v8_repo');
+                document.getElementById('filename').value = localStorage.getItem('v8_filename');
+                document.getElementById('commitMsg').value = localStorage.getItem('v8_commit');
+                try {
+                    fileStorage = JSON.parse(localStorage.getItem('v8_files')) || { main: '', style: '', script: '' };
+                } catch(e) {}
+                document.getElementById('code').value = fileStorage[currentTab] || '';
+                triggerLiveUpdate();
+                log("กู้คืนเซสชันเดิมจากเบราว์เซอร์สำเร็จ");
+            } else {
+                loadPreset('basic');
+            }
+        }
+
+        function copyLink() {
+            const linkInput = document.getElementById('resultLink');
+            linkInput.select();
+            document.execCommand('copy');
+            alert("คัดลอกลิงก์สำเร็จ!");
+            log("คัดลอกลิงก์ปลายทางเรียบร้อย");
+        }
+
+        function exportProjectZip() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fileStorage, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "nexus_omega_v8_project.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            log("ส่งออกไฟล์โปรเจกต์เป็น JSON สำเร็จ");
+        }
+
+        async function startQuantumDeploy() {
+            const token = document.getElementById('token').value.trim();
+            const repo = document.getElementById('repo').value.trim();
+            const filename = document.getElementById('filename').value.trim();
+            const commitMsg = document.getElementById('commitMsg').value.trim();
+            const code = fileStorage['main'] || document.getElementById('code').value;
+
+            if(!token || !repo || !filename || !code) {
+                alert("กรุณากรอกข้อมูลการเชื่อมต่อและโค้ดให้ครบถ้วน!");
+                log("❌ ข้อผิดพลาด: ข้อมูลตั้งต้นไม่ครบ");
                 return;
             }
 
-            if(!filename.endsWith('.html')) {
-                filename += '.html';
-            }
+            log("[01/04] กำลังเตรียมแพ็กเกจข้อมูลด้วยเครื่องมือ Quantum...");
+            await new Promise(r => setTimeout(r, 300));
+            log("[02/04] แปลงรหัสโค้ดเป็นรูปแบบ Base64...");
+            await new Promise(r => setTimeout(r, 300));
+            log("[03/04] เชื่อมต่อไปยัง GitHub API...");
 
-            // รีเซ็ตการแสดงผล
-            btn.disabled = true;
-            resultCard.style.display = 'none';
-            consoleBox.style.display = 'block';
+            const encodedContent = btoa(unescape(encodeURIComponent(code)));
+            const apiUrl = `https://api.github.com/repos/${repo}/contents/${filename}`;
 
-            // จำลองสเต็ปการทำงานแบบหรูหราทีละขั้นตอน
-            await sleep(800);
-            updateStep(1, 'success', '✔️ [01] วิเคราะห์โครงสร้างโค้ดสมบูรณ์: โครงสร้าง HTML ถูกต้อง');
-            updateStep(2, 'active', '⏳ [02] กำลังตรวจสอบความปลอดภัยระบบ (Security Scanning)...');
-            
-            await sleep(1000);
-            updateStep(2, 'success', '✔️ [02] ระบบความปลอดภัยผ่านฉลุย: ปลอดภัยไร้สิ่งแปลกปลอม');
-            updateStep(3, 'active', '⏳ [03] กำลังเข้ารหัสชุดข้อมูลดิบ...');
-
-            await sleep(800);
-            updateStep(3, 'success', '✔️ [03] เข้ารหัส Base64 สำเร็จ');
-            updateStep(4, 'active', '⏳ [04] กำลังเชื่อมต่อคลาวด์ GitHub เพื่อสร้างไฟล์...');
-
-            // ทำงานส่ง API จริงเบื้องหลัง
-            const url = `https://api.github.com/repos/${username}/${repo}/contents/${filename}`;
-            const contentEncoded = btoa(unescape(encodeURIComponent(code)));
+            let shaKey = "";
+            try {
+                const checkRes = await fetch(apiUrl, {
+                    headers: { "Authorization": `token ${token}` }
+                });
+                if(checkRes.ok) {
+                    const info = await checkRes.json();
+                    shaKey = info.sha;
+                    log("พบไฟล์เดิมในระบบ กำลังทำกระบวนการอัปเดตทับ...");
+                }
+            } catch(e) {}
 
             try {
-                const response = await fetch(url, {
-                    method: 'PUT',
+                log("[04/04] ส่งข้อมูลขึ้น GitHub Repository...");
+                const response = await fetch(apiUrl, {
+                    method: "PUT",
                     headers: {
-                        'Authorization': `token ${token}`,
-                        'Content-Type': 'application/json',
+                        "Authorization": `token ${token}`,
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        message: `Enterprise Deploy ${filename} via Nexus Cloud`,
-                        content: contentEncoded
+                        message: commitMsg,
+                        content: encodedContent,
+                        sha: shaKey ? shaKey : undefined
                     })
                 });
 
                 if(response.ok) {
-                    await sleep(1000);
-                    updateStep(4, 'success', '✔️ [04] สร้างไฟล์และเผยแพร่สำเร็จ (Status 201 Created)');
+                    log("✅ [SUCCESS] Deploy ขึ้นคลาวด์สำเร็จสมบูรณ์!");
+                    const parts = repo.split('/');
+                    const liveUrl = `https://${parts[0]}.github.io/${parts[1]}/${filename}`;
                     
-                    const liveUrl = `https://${username}.github.io/${repo}/${filename}`;
-                    document.getElementById('link-text').innerText = liveUrl;
-                    document.getElementById('visit-btn').href = liveUrl;
+                    document.getElementById('resultLink').value = liveUrl;
+                    document.getElementById('resultBox').style.display = 'flex';
                     
-                    setTimeout(() => {
-                        consoleBox.style.display = 'none';
-                        resultCard.style.display = 'block';
-                        btn.disabled = false;
-                    }, 500);
-
+                    // บันทึกลงประวัติ
+                    const historyBox = document.getElementById('deployHistory');
+                    historyBox.innerHTML = `• อัปโหลด ${filename} สำเร็จ (${new Date().toLocaleTimeString()})<br>` + historyBox.innerHTML;
+                    
+                    alert(` Deploy ไฟล์ ${filename} สำเร็จ!\nรอ GitHub Pages อัปเดตประมาณ 1-2 นาที แล้วกดเข้าลิงก์ได้เลย`);
                 } else {
                     const err = await response.json();
-                    throw new Error(err.message);
+                    log(`❌ [FAILED] ข้อผิดพลาดจาก GitHub: ${err.message}`);
+                    alert(`เกิดข้อผิดพลาด: ${err.message}`);
                 }
-            } catch (error) {
-                updateStep(4, 'error', '❌ [04] เกิดข้อผิดพลาด: ' + error.message);
-                btn.disabled = false;
+            } catch(error) {
+                log(`❌ [ERROR] เชื่อมต่อเครือข่ายล้มเหลว: ${error.message}`);
+                alert("ไม่สามารถเชื่อมต่อกับ GitHub ได้ ตรวจสอบเครือข่ายหรือ Token ของคุณ");
             }
         }
 
-        function updateStep(stepNo, statusClass, text) {
-            const el = document.getElementById(`step-${stepNo}`);
-            el.className = `console-line ${statusClass}`;
-            el.innerText = text;
-            el.style.opacity = '1';
-
-            // เปิดสเต็ปถัดไปให้สว่างขึ้นถ้ามี
-            if(stepNo < 4) {
-                document.getElementById(`step-${stepNo + 1}`).style.opacity = '0.7';
-            }
-        }
-
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        function copyLink() {
-            const linkText = document.getElementById('link-text').innerText;
-            navigator.clipboard.writeText(linkText);
-            alert("✨ คัดลอกลิงก์เว็บไซต์เรียบร้อยแล้ว!");
-        }
+        // เริ่มโหลดระบบอัตโนมัติ
+        loadSavedData();
     </script>
-
 </body>
 </html>
