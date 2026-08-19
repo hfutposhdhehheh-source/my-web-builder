@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CodeMind AI V2</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;background:#070a10;color:#fff;
+font-family:system-ui,-apple-system,Segoe UI,sans-serif
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;border:0}
+header{
+height:64px;background:#0c1019;border-bottom:1px solid #20283a;
+display:flex;align-items:center;justify-content:space-between;
+padding:0 16px;position:sticky;top:0;z-index:20
+}
+.logo{font-size:20px;font-weight:800}
+.logo b{color:#7767ff}
+.top{display:flex;gap:8px}
+.btn{
+background:#171e2d;color:#fff;padding:9px 13px;border-radius:9px
+}
+.primary{background:#6d5dfc}
+.layout{display:grid;grid-template-columns:230px 1fr;height:calc(100vh - 64px)}
+aside{
+background:#090d15;border-right:1px solid #20283a;padding:12px
+}
+nav{display:grid;gap:7px}
+nav button{
+background:#121827;color:#dce2f2;padding:12px;border-radius:9px;text-align:left
+}
+nav button:hover{background:#202a3f}
+main{padding:16px;overflow:auto}
+.panel{
+background:#0d131e;border:1px solid #222c40;border-radius:15px;padding:15px;
+margin-bottom:14px
+}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+.title{
+display:flex;align-items:center;justify-content:space-between;margin-bottom:10px
+}
+.title h2{font-size:16px;margin:0}
+select,input,textarea{
+background:#080c13;color:#fff;border:1px solid #29344a;
+border-radius:9px;outline:none
+}
+input,select{padding:11px;width:100%}
+textarea{
+width:100%;height:420px;resize:vertical;
+padding:14px;font-family:Consolas,monospace;
+font-size:14px;line-height:1.6
+}
+textarea:focus,input:focus,select:focus{border-color:#7566ff}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.actions button{padding:9px 11px;border-radius:8px;background:#171f30;color:white}
+.actions .primary{background:#6d5dfc}
+.status{font-size:12px;color:#77839b;margin-top:8px}
+.chat{
+height:420px;overflow:auto;display:flex;flex-direction:column;
+gap:9px;padding:3px
+}
+.msg{
+max-width:92%;padding:11px 13px;border-radius:12px;
+white-space:pre-wrap;line-height:1.5
+}
+.msg.ai{background:#171e2d;align-self:flex-start}
+.msg.user{background:#5145c9;align-self:flex-end}
+.chatbar{display:flex;gap:7px;margin-top:9px}
+.chatbar input{flex:1}
+.chatbar button{padding:0 16px;border-radius:9px}
+.memory{
+display:flex;gap:8px;align-items:center
+}
+.memory input{flex:1}
+.preview{
+width:100%;height:420px;background:#fff;border-radius:10px;border:0
+}
+.hidden{display:none}
+.small{font-size:12px;color:#77839b;margin-top:7px}
+#historyList,#promptList{
+display:grid;gap:6px;max-height:240px;overflow:auto
+}
+.item{
+background:#121927;padding:10px;border-radius:8px;
+cursor:pointer;color:#dce2f2
+}
+.item:hover{background:#202a3f}
+@media(max-width:850px){
+.layout{grid-template-columns:1fr;height:auto}
+aside{border-right:0;border-bottom:1px solid #20283a}
+nav{display:flex;overflow:auto}
+nav button{white-space:nowrap}
+.grid{grid-template-columns:1fr}
+main{padding:9px}
+textarea,.chat{height:330px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">⚡ CodeMind <b>AI V2</b></div>
+<div class="top">
+<button class="btn" onclick="newChat()">＋ Chat</button>
+<button class="btn primary" onclick="saveAll()">💾 Save</button>
+</div>
+</header>
+
+<div class="layout">
+
+<aside>
+<nav>
+<button onclick="show('chatPanel')">💬 AI Chat</button>
+<button onclick="show('codePanel')">💻 Code Editor</button>
+<button onclick="show('previewPanel')">🌐 Preview</button>
+<button onclick="show('historyPanel')">📜 History</button>
+<button onclick="show('settingsPanel')">⚙️ Settings</button>
+</nav>
+</aside>
+
+<main>
+
+<!-- CHAT -->
+<section id="chatPanel" class="panel">
+<div class="title">
+<h2>🤖 AI Assistant</h2>
+<span id="apiState">● Ready</span>
+</div>
+
+<div id="chat" class="chat">
+<div class="msg ai">
+สวัสดีครับ 👋
+ผมคือ CodeMind AI V2
+ใส่ API Key แล้วเริ่มคุยได้เลย
+</div>
+</div>
+
+<div class="chatbar">
+<input id="prompt" placeholder="พิมพ์คำสั่ง เช่น สร้างเว็บ Login...">
+<button class="primary" onclick="send()">ส่ง</button>
+</div>
+</section>
+
+
+<!-- CODE -->
+<section id="codePanel" class="panel hidden">
+
+<div class="title">
+<h2>💻 Code Editor</h2>
+
+<select id="language" style="width:150px">
+<option>JavaScript</option>
+<option>HTML</option>
+<option>CSS</option>
+<option>Python</option>
+<option>TypeScript</option>
+<option>Lua</option>
+<option>JSON</option>
+</select>
+</div>
+
+<textarea id="code" placeholder="// เขียนหรือวางโค้ดตรงนี้..."></textarea>
+
+<div class="actions">
+
+<button class="primary" onclick="aiAction('generate')">✨ Generate</button>
+<button onclick="aiAction('fix')">🐛 Fix</button>
+<button onclick="aiAction('explain')">🔎 Explain</button>
+<button onclick="aiAction('refactor')">🔄 Refactor</button>
+<button onclick="aiAction('optimize')">⚡ Optimize</button>
+<button onclick="aiAction('test')">🧪 Test</button>
+<button onclick="copyCode()">📋 Copy</button>
+<button onclick="downloadCode()">📥 Download</button>
+<button onclick="importCode()">📂 Import</button>
+
+</div>
+
+<div id="codeStatus" class="status">พร้อมใช้งาน</div>
+
+</section>
+
+
+<!-- PREVIEW -->
+<section id="previewPanel" class="panel hidden">
+
+<div class="title">
+<h2>🌐 HTML Preview</h2>
+<button class="btn primary" onclick="preview()">▶ Preview</button>
+</div>
+
+<iframe id="frame" class="preview"></iframe>
+
+</section>
+
+
+<!-- HISTORY -->
+<section id="historyPanel" class="panel hidden">
+
+<div class="title">
+<h2>📜 Chat History</h2>
+<button class="btn" onclick="clearHistory()">🗑️ Clear</button>
+</div>
+
+<div id="historyList"></div>
+
+</section>
+
+
+<!-- SETTINGS -->
+<section id="settingsPanel" class="panel hidden">
+
+<h2>⚙️ Settings</h2>
+
+<p class="small">🔑 API Key</p>
+
+<div class="chatbar">
+<input id="key" type="password" placeholder="ใส่ API Key">
+<button class="primary" onclick="saveKey()">บันทึก</button>
+<button onclick="removeKey()">ลบ</button>
+</div>
+
+<p class="small">🤖 Model</p>
+
+<select id="model">
+<option value="gpt-5.6">gpt-5.6</option>
+<option value="gpt-5.6-luna">gpt-5.6-luna</option>
+<option value="gpt-5.6-terra">gpt-5.6-terra</option>
+<option value="gpt-5.6-sol">gpt-5.6-sol</option>
+</select>
+
+<p class="small">🧠 AI Memory</p>
+
+<div class="memory">
+<input id="memory" placeholder="เช่น ฉันชอบ JavaScript และใช้มือถือ">
+<button class="primary" onclick="saveMemory()">บันทึก</button>
+</div>
+
+<p class="small">📋 Prompt Library</p>
+
+<div class="actions">
+<button onclick="quickPrompt('สร้างโค้ดให้ฉัน')">✨ Generate</button>
+<button onclick="quickPrompt('แก้ Bug ให้ฉัน')">🐛 Fix</button>
+<button onclick="quickPrompt('อธิบายโค้ดนี้')">🔎 Explain</button>
+<button onclick="quickPrompt('ปรับปรุงโค้ดนี้')">🔄 Refactor</button>
+<button onclick="quickPrompt('ทำให้โค้ดเร็วขึ้น')">⚡ Optimize</button>
+</div>
+
+</section>
+
+</main>
+</div>
+
+<input id="file" type="file" class="hidden">
+
+<script>
+const $=id=>document.getElementById(id);
+
+let history=JSON.parse(localStorage.getItem("cm_history")||"[]");
+
+$("key").value=localStorage.getItem("cm_key")||"";
+$("model").value=localStorage.getItem("cm_model")||"gpt-5.6";
+$("memory").value=localStorage.getItem("cm_memory")||"";
+
+function show(id){
+["chatPanel","codePanel","previewPanel","historyPanel","settingsPanel"]
+.forEach(x=>$(x).classList.add("hidden"));
+$(id).classList.remove("hidden");
+}
+
+function saveKey(){
+let k=$("key").value.trim();
+if(!k)return alert("กรุณาใส่ API Key");
+localStorage.setItem("cm_key",k);
+$("apiState").textContent="● API Key Saved";
+alert("บันทึกแล้ว ✓");
+}
+
+function removeKey(){
+localStorage.removeItem("cm_key");
+$("key").value="";
+$("apiState").textContent="● No API Key";
+}
+
+function saveMemory(){
+localStorage.setItem("cm_memory",$("memory").value);
+alert("บันทึก Memory แล้ว ✓");
+}
+
+function saveAll(){
+localStorage.setItem("cm_model",$("model").value);
+saveMemory();
+}
+
+function add(text,type){
+let d=document.createElement("div");
+d.className="msg "+type;
+d.textContent=text;
+$("chat").appendChild(d);
+$("chat").scrollTop=$("chat").scrollHeight;
+}
+
+async function send(custom=null){
+
+let key=$("key").value.trim()||localStorage.getItem("cm_key");
+
+if(!key){
+alert("ไปที่ Settings แล้วใส่ API Key ก่อนครับ");
+show("settingsPanel");
+return;
+}
+
+let text=custom||$("prompt").value.trim();
+if(!text)return;
+
+add(text,"user");
+$("prompt").value="";
+
+let load=document.createElement("div");
+load.className="msg ai";
+load.textContent="กำลังคิด... 🤖";
+$("chat").appendChild(load);
+
+let memory=localStorage.getItem("cm_memory")||"";
+let code=$("code").value||"";
+
+try{
+
+let r=await fetch("https://api.openai.com/v1/responses",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+key
+},
+body:JSON.stringify({
+model:$("model").value,
+input:[
+{
+role:"system",
+content:
+"คุณคือ CodeMind AI V2 ผู้ช่วยเขียนโปรแกรม ตอบภาษาไทยเป็นหลัก ช่วยสร้าง แก้ อธิบาย Refactor Optimize และทดสอบโค้ด ให้คำตอบที่ใช้งานได้จริง"+
+"\nMemory:"+memory+
+"\nCurrent Code:\n"+code
+},
+{
+role:"user",
+content:text
+}
+]
+})
+});
+
+let data=await r.json();
+load.remove();
+
+if(!r.ok){
+add("❌ "+(data.error?.message||"API Error"),"ai");
+return;
+}
+
+let answer="";
+
+for(const item of data.output||[]){
+if(item.type==="message"){
+for(const c of item.content||[]){
+if(c.type==="output_text")answer+=c.text;
+}
+}
+}
+
+if(!answer)answer="AI ไม่ได้ส่งข้อความกลับมา";
+
+add(answer,"ai");
+
+history.push({
+time:new Date().toLocaleString(),
+user:text,
+ai:answer
+});
+
+localStorage.setItem("cm_history",JSON.stringify(history));
+
+renderHistory();
+
+}catch(e){
+
+load.remove();
+add("❌ เชื่อมต่อ API ไม่สำเร็จ\n"+e.message,"ai");
+
+}
+}
+
+function aiAction(type){
+
+let code=$("code").value.trim();
+
+if(type!=="generate"&&!code){
+alert("ใส่โค้ดก่อนครับ");
+return;
+}
+
+let prompts={
+generate:"สร้างโค้ดสำหรับสิ่งที่ฉันต้องการ โดยใช้ภาษา "+$("language").value,
+fix:"ตรวจหา Bug และแก้ไขโค้ดนี้ พร้อมส่งโค้ดที่แก้แล้ว",
+explain:"อธิบายโค้ดนี้ทีละส่วนแบบเข้าใจง่าย",
+refactor:"Refactor โค้ดนี้ให้สะอาด อ่านง่าย และดูเป็นมืออาชีพ",
+optimize:"Optimize โค้ดนี้ให้เร็วและใช้ทรัพยากรน้อยลง",
+test:"สร้าง Test สำหรับโค้ดนี้"
+};
+
+send(prompts[type]);
+show("chatPanel");
+}
+
+function quickPrompt(x){
+$("prompt").value=x;
+show("chatPanel");
+$("prompt").focus();
+}
+
+function newChat(){
+$("chat").innerHTML=
+'<div class="msg ai">เริ่มแชตใหม่แล้วครับ ✨</div>';
+show("chatPanel");
+}
+
+function copyCode(){
+navigator.clipboard.writeText($("code").value);
+$("codeStatus").textContent="✓ Copy สำเร็จ";
+}
+
+function downloadCode(){
+
+let ext={
+JavaScript:"js",
+HTML:"html",
+CSS:"css",
+Python:"py",
+TypeScript:"ts",
+Lua:"lua",
+JSON:"json"
+}[$("language").value]||"txt";
+
+let blob=new Blob(
+[$("code").value],
+{type:"text/plain"}
+);
+
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="codemind."+ext;
+a.click();
+URL.revokeObjectURL(a.href);
+}
+
+function importCode(){
+$("file").click();
+}
+
+$("file").onchange=e=>{
+
+let f=e.target.files[0];
+if(!f)return;
+
+let reader=new FileReader();
+
+reader.onload=()=>{
+$("code").value=reader.result;
+$("codeStatus").textContent="✓ Import สำเร็จ";
+};
+
+reader.readAsText(f);
+};
+
+function preview(){
+
+let html=$("code").value;
+
+let doc=$("frame").contentDocument;
+doc.open();
+doc.write(html);
+doc.close();
+
+show("previewPanel");
+}
+
+function renderHistory(){
+
+$("historyList").innerHTML="";
+
+history.slice().reverse().forEach((h,i)=>{
+
+let d=document.createElement("div");
+d.className="item";
+d.textContent=h.time+" — "+h.user;
+
+d.onclick=()=>{
+add(h.ai,"ai");
+show("chatPanel");
+};
+
+$("historyList").appendChild(d);
+
+});
+}
+
+function clearHistory(){
+
+history=[];
+localStorage.removeItem("cm_history");
+renderHistory();
+
+}
+
+renderHistory();
+
+$("prompt").addEventListener("keydown",e=>{
+if(e.key==="Enter")send();
+});
+
+</script>
+
+</body>
+</html>
