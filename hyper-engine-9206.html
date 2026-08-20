@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ultimate Toolbox 240+</title>
+
+<style>
+*{box-sizing:border-box}
+:root{
+ --bg:#070910;
+ --panel:#0f1420;
+ --panel2:#151b2a;
+ --text:#f4f7ff;
+ --muted:#8995ac;
+ --line:#273149;
+ --accent:#6d7cff;
+ --accent2:#9b5cff;
+}
+.light{
+ --bg:#f3f5fa;
+ --panel:#fff;
+ --panel2:#edf0f6;
+ --text:#111827;
+ --muted:#68748b;
+ --line:#d8deea;
+}
+body{
+ margin:0;
+ background:var(--bg);
+ color:var(--text);
+ font-family:system-ui,-apple-system,"Noto Sans Thai",sans-serif;
+ transition:.2s;
+}
+header{
+ position:sticky;
+ top:0;
+ z-index:20;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ padding:16px 5%;
+ border-bottom:1px solid var(--line);
+ background:color-mix(in srgb,var(--bg) 88%,transparent);
+ backdrop-filter:blur(15px);
+}
+.logo{
+ font-weight:1000;
+ letter-spacing:2px;
+ font-size:21px;
+}
+.logo b{color:var(--accent)}
+header small{color:var(--muted)}
+button{
+ border:1px solid var(--line);
+ background:var(--panel);
+ color:var(--text);
+ padding:10px 13px;
+ border-radius:11px;
+ cursor:pointer;
+}
+button:hover{border-color:var(--accent)}
+.primary{
+ background:var(--accent);
+ color:white;
+ border-color:var(--accent);
+}
+.hero{
+ max-width:1200px;
+ margin:auto;
+ padding:55px 5% 25px;
+}
+.hero h1{
+ font-size:clamp(38px,7vw,72px);
+ line-height:.95;
+ margin:0;
+}
+.hero h1 span{
+ background:linear-gradient(90deg,var(--accent),var(--accent2));
+ color:transparent;
+ background-clip:text;
+}
+.hero p{color:var(--muted)}
+.search{
+ width:100%;
+ padding:17px;
+ border:1px solid var(--line);
+ border-radius:15px;
+ background:var(--panel);
+ color:var(--text);
+ font-size:16px;
+ outline:none;
+}
+.info{
+ max-width:1200px;
+ margin:auto;
+ padding:10px 5%;
+ color:var(--muted);
+}
+.categories{
+ max-width:1200px;
+ margin:auto;
+ padding:10px 5% 20px;
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+}
+.categories button.active{
+ background:var(--accent);
+ color:white;
+ border-color:var(--accent);
+}
+.grid{
+ max-width:1300px;
+ margin:auto;
+ padding:0 5% 70px;
+ display:grid;
+ grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+ gap:14px;
+}
+.card{
+ position:relative;
+ padding:18px;
+ background:var(--panel);
+ border:1px solid var(--line);
+ border-radius:18px;
+ cursor:pointer;
+ transition:.18s;
+}
+.card:hover{
+ transform:translateY(-3px);
+ border-color:var(--accent);
+}
+.card .star{
+ position:absolute;
+ right:13px;
+ top:13px;
+ font-size:18px;
+}
+.card .icon{font-size:28px}
+.card h3{font-size:16px;margin:10px 0 5px}
+.card p{font-size:12px;color:var(--muted);margin:0}
+.empty{
+ grid-column:1/-1;
+ padding:60px;
+ text-align:center;
+ color:var(--muted);
+}
+dialog{
+ width:min(760px,94vw);
+ max-height:90vh;
+ border:1px solid var(--line);
+ border-radius:20px;
+ padding:0;
+ background:var(--panel);
+ color:var(--text);
+ box-shadow:0 30px 100px #000b;
+}
+dialog::backdrop{background:#000b}
+.modalHead{
+ padding:18px 20px;
+ border-bottom:1px solid var(--line);
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+}
+.modalHead h2{margin:0}
+.modalHead small{color:var(--muted)}
+.modalBody{padding:20px}
+label{
+ display:block;
+ font-size:13px;
+ color:var(--muted);
+ margin-top:8px;
+}
+input,textarea,select{
+ width:100%;
+ padding:12px;
+ margin:6px 0 10px;
+ border:1px solid var(--line);
+ border-radius:11px;
+ background:var(--bg);
+ color:var(--text);
+ outline:none;
+}
+textarea{min-height:180px;resize:vertical}
+.row{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+}
+.actions{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+}
+.result{
+ margin-top:12px;
+ min-height:70px;
+ padding:14px;
+ border-radius:12px;
+ background:var(--bg);
+ border:1px solid var(--line);
+ white-space:pre-wrap;
+ word-break:break-word;
+}
+.toast{
+ position:fixed;
+ right:20px;
+ bottom:20px;
+ padding:13px 17px;
+ border-radius:12px;
+ background:var(--panel2);
+ border:1px solid var(--line);
+ opacity:0;
+ transform:translateY(15px);
+ transition:.2s;
+ z-index:100;
+}
+.toast.show{
+ opacity:1;
+ transform:none;
+}
+@media(max-width:600px){
+ .grid{grid-template-columns:1fr 1fr}
+ .row{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div>
+  <div class="logo">ULTIMATE <b>TOOLBOX</b></div>
+  <small id="counter">240 / 240 Tools</small>
+ </div>
+ <div>
+  <button onclick="showFav()">⭐</button>
+  <button onclick="theme()">🌙</button>
+ </div>
+</header>
+
+<section class="hero">
+ <h1>เครื่องมือ<br><span>สารพัดประโยชน์</span></h1>
+ <p>240 เครื่องมือในหน้าเดียว</p>
+ <input
+  class="search"
+  id="search"
+  placeholder="🔎 ค้นหาเครื่องมือ..."
+  oninput="render()"
+ >
+</section>
+
+<div class="info" id="info"></div>
+<div class="categories" id="categories"></div>
+<main class="grid" id="grid"></main>
+
+<dialog id="dlg">
+ <div class="modalHead">
+  <div>
+   <h2 id="title"></h2>
+   <small id="subtitle"></small>
+  </div>
+  <button onclick="dlg.close()">✕</button>
+ </div>
+ <div class="modalBody" id="body"></div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+/* ==========================================================
+   TOOL REGISTRY
+   12 หมวด × 20 = 240 เครื่องมือ
+========================================================== */
+
+const groups={
+"🧮 คณิตศาสตร์":[
+"เครื่องคิดเลข","เปอร์เซ็นต์","ส่วนลด","ทิป","ค่าเฉลี่ย",
+"มัธยฐาน","ฐานนิยม","ผลรวม","ค่าสูงสุด","ค่าต่ำสุด",
+"GCD","LCM","เลขยกกำลัง","รากที่สอง","แฟกทอเรียล",
+"เศษส่วนเป็นทศนิยม","ทศนิยมเป็นเปอร์เซ็นต์","อัตราส่วน",
+"กฎสาม","สุ่มตัวเลข"
+],
+
+"🔤 ข้อความ":[
+"นับตัวอักษร","นับคำ","นับบรรทัด","ตัวพิมพ์ใหญ่","ตัวพิมพ์เล็ก",
+"Title Case","กลับข้อความ","ลบช่องว่าง","Trim","ลบบรรทัดซ้ำ",
+"เรียงบรรทัด","เรียงกลับบรรทัด","ลบอักขระซ้ำ","Slugify",
+"JSON Stringify","URL Encode","URL Decode","Base64 Encode",
+"Base64 Decode","Lorem Ipsum"
+],
+
+"💻 นักพัฒนา":[
+"JSON Formatter","JSON Minifier","HTML Escape","HTML Unescape",
+"Regex Tester","UUID Generator","Unix Timestamp",
+"Timestamp เป็นวันที่","Hex Encode","Hex Decode","Binary Encode",
+"Binary Decode","ASCII Table","URL Parser","Query String Builder",
+"HTML Minifier","CSS Minifier","JS Escape","JSON Escape","Data URI"
+],
+
+"🔐 ความปลอดภัย":[
+"สร้างรหัสผ่าน","ตรวจรหัสผ่าน","สุ่ม Token","UUID v4",
+"SHA-256","SHA-1","MD5 Demo","HMAC Demo","สร้าง PIN",
+"สุ่ม Hex","สุ่ม Base64","สุ่ม Bytes","ตรวจ HTTPS",
+"ตรวจ URL","สร้าง Secret","สร้าง Salt","Mask Text",
+"ลบข้อมูลส่วนตัว","Password Entropy","ข้อความลับ Demo"
+],
+
+"🎨 สีและดีไซน์":[
+"HEX → RGB","RGB → HEX","RGB → HSL","HSL → RGB",
+"HEX → HSL","สุ่มสี","สุ่ม Palette","Gradient Generator",
+"Contrast Ratio","Invert Color","Grayscale","Lighten Color",
+"Darken Color","Complementary","Triadic Colors","RGBA Preview",
+"CSS Color","CSS Variable","Color Name","Shadow Generator"
+],
+
+"📅 วันเวลา":[
+"เวลาปัจจุบัน","วันที่วันนี้","Unix Now","Unix → Date",
+"Date → Unix","Countdown","Stopwatch","Timer","บวกวัน",
+"ลบวัน","วันในสัปดาห์","จำนวนวันในเดือน","ปีอธิกสุรทิน",
+"อายุ","ห่างกันกี่วัน","ห่างกันกี่ชั่วโมง","ISO 8601",
+"UTC Time","Time Zone","สัปดาห์ของปี"
+],
+
+"🔄 แปลงหน่วย":[
+"เมตร → ฟุต","ฟุต → เมตร","กิโลเมตร → ไมล์","ไมล์ → กิโลเมตร",
+"กิโลกรัม → ปอนด์","ปอนด์ → กิโลกรัม","กรัม → ออนซ์",
+"ลิตร → แกลลอน","แกลลอน → ลิตร","เซนติเมตร → นิ้ว",
+"นิ้ว → เซนติเมตร","กม./ชม. → ไมล์/ชม.","ไมล์/ชม. → กม./ชม.",
+"เซลเซียส → ฟาเรนไฮต์","ฟาเรนไฮต์ → เซลเซียส",
+"เซลเซียส → เคลวิน","ไบต์ → KB","KB → MB","MB → GB","GB → TB"
+],
+
+"🖼️ รูปภาพ":[
+"Image Preview","รูป → Base64","Base64 → รูป","ปรับขนาดรูป",
+"ข้อมูลรูปภาพ","สร้าง Data URL","ตรวจนามสกุลรูป",
+"Pixel Color","สุ่ม Gradient","CSS Background","SVG Circle",
+"SVG Rectangle","SVG Pattern","Avatar SVG","Placeholder SVG",
+"Favicon SVG","QR SVG","Barcode Text","Image Placeholder",
+"Aspect Ratio"
+],
+
+"📁 ไฟล์และข้อมูล":[
+"File Info","อ่าน Text File","Text Download","JSON Download",
+"CSV → JSON","JSON → CSV","CSV Preview","Base64 File",
+"Data URL → Text","MIME Guess","ขนาดข้อความ","Bytes → KB",
+"KB → MB","MB → GB","JSON Keys","JSON Values","JSON Sort",
+"JSON Pretty","JSON Compact","สร้าง CSV"
+],
+
+"🌐 เว็บ":[
+"ตรวจ URL","แยก URL","สร้าง Query String","อ่าน Query String",
+"Meta Tags","Open Graph","Robots.txt","Sitemap XML",
+"HTML Boilerplate","CSS Reset","JS Fetch Template",
+"API Request","cURL Generator","Markdown Link","Markdown Image",
+"HTML Link","HTML Image","CSS Font Face","CSS Gradient",
+"Canonical Tag"
+],
+
+"🎲 สุ่มและความสนุก":[
+"โยนเหรียญ","ทอยลูกเต๋","สุ่ม 1-10","สุ่ม 1-100",
+"สุ่ม 1-1000","สุ่มชื่อ","สุ่มสี","สุ่มคำ","สุ่มตัวอักษร",
+"สุ่ม Emoji","สุ่มไอคอน","สุ่ม Yes/No","สุ่มจริง/เท็จ",
+"สุ่มทีม","สุ่มอันดับ","จับฉลาก","สุ่ม PIN 4 หลัก",
+"สุ่ม PIN 6 หลัก","สุ่มรหัส 8 หลัก","สุ่ม Password"
+],
+
+"🛠️ เครื่องมือทั่วไป":[
+"BMI Calculator","แคลอรีโดยประมาณ","อัตราส่วน",
+"ดอกเบี้ย","ดอกเบี้ยทบต้น","แบ่งบิล","ภาษี",
+"กำไร","มาร์จิน","ส่วนต่าง","พื้นที่สี่เหลี่ยม",
+"พื้นที่วงกลม","พื้นที่สามเหลี่ยม","ปริมาตรลูกบาศก์",
+"ปริมาตรทรงกระบอก","Pace Converter","ความเร็วเฉลี่ย",
+"ระยะทาง","เวลาเดินทาง","เลขฐาน"
+]
+};
+
+/* ตรวจจำนวน */
+let TOOLS=[];
+let num=1;
+
+for(const [category,names] of Object.entries(groups)){
+ for(const name of names){
+  TOOLS.push({
+   id:num++,
+   name,
+   category
+  });
+ }
+}
+
+console.assert(TOOLS.length===240,"จำนวน Tool ต้องเป็น 240");
+
+let category="ทั้งหมด";
+let favorites=JSON.parse(
+ localStorage.getItem("ut_favorites")||"[]"
+);
+
+/* ==========================================================
+   CATEGORY
+========================================================== */
+
+function makeCategories(){
+
+ let html=`
+ <button class="active"
+ onclick="setCategory('ทั้งหมด',this)">
+ ทั้งหมด
+ </button>`;
+
+ for(const cat of Object.keys(groups)){
+  html+=`
+  <button
+   onclick="setCategory('${esc(cat)}',this)">
+   ${cat}
+  </button>`;
+ }
+
+ categories.innerHTML=html;
+}
+
+function setCategory(c,b){
+
+ category=c;
+
+ document.querySelectorAll(".categories button")
+ .forEach(x=>x.classList.remove("active"));
+
+ b.classList.add("active");
+
+ render();
+}
+
+/* ==========================================================
+   RENDER
+========================================================== */
+
+function render(){
+
+ let q=search.value.toLowerCase();
+
+ let list=TOOLS.filter(t=>
+  (category==="ทั้งหมด"||t.category===category)&&
+  (
+   !q||
+   t.name.toLowerCase().includes(q)||
+   t.category.toLowerCase().includes(q)
+  )
+ );
+
+ info.textContent=
+ `แสดง ${list.length} / ${TOOLS.length} เครื่องมือ`;
+
+ grid.innerHTML=list.length?
+
+ list.map(t=>`
+ <article class="card" onclick="openTool(${t.id})">
+
+  <span class="star"
+   onclick="event.stopPropagation();favorite(${t.id})">
+   ${favorites.includes(t.id)?"⭐":"☆"}
+  </span>
+
+  <div class="icon">
+   ${t.category.split(" ")[0]}
+  </div>
+
+  <h3>${esc(t.name)}</h3>
+
+  <p>${esc(t.category.substring(2))}</p>
+
+ </article>
+ `).join("")
+
+ :
+ `<div class="empty">ไม่พบเครื่องมือ</div>`;
+}
+
+/* ==========================================================
+   FAVORITE
+========================================================== */
+
+function favorite(id){
+
+ if(favorites.includes(id))
+  favorites=favorites.filter(x=>x!==id);
+ else
+  favorites.push(id);
+
+ localStorage.setItem(
+  "ut_favorites",
+  JSON.stringify(favorites)
+ );
+
+ render();
+}
+
+function showFav(){
+
+ category="__fav";
+
+ info.textContent="⭐ รายการโปรด";
+
+ let list=TOOLS.filter(x=>favorites.includes(x.id));
+
+ grid.innerHTML=list.length?
+ list.map(t=>`
+ <article class="card" onclick="openTool(${t.id})">
+  <span class="star">⭐</span>
+  <div class="icon">${t.category.split(" ")[0]}</div>
+  <h3>${esc(t.name)}</h3>
+  <p>${esc(t.category.substring(2))}</p>
+ </article>
+ `).join("")
+ :
+ `<div class="empty">
+ ยังไม่มีรายการโปรด
+ </div>`;
+}
+
+/* ==========================================================
+   TOOL UI
+========================================================== */
+
+function openTool(id){
+
+ const t=TOOLS.find(x=>x.id===id);
+
+ title.textContent=t.name;
+ subtitle.textContent=t.category;
+
+ body.innerHTML=buildUI(t.name);
+
+ dlg.showModal();
+
+ bind(t.name);
+}
+
+function buildUI(name){
+
+ if([
+  "เครื่องคิดเลข","เปอร์เซ็นต์","ส่วนลด","ทิป",
+  "ค่าเฉลี่ย","ผลรวม","GCD","LCM","เลขยกกำลัง",
+  "อัตราส่วน","กฎสาม","กำไร","มาร์จิน","ส่วนต่าง"
+ ].includes(name)){
+
+  return `
+   <div class="row">
+    <div>
+     <label>ค่า A</label>
+     <input id="a" type="number">
+    </div>
+    <div>
+     <label>ค่า B</label>
+     <input id="b" type="number">
+    </div>
+   </div>
+
+   <div class="actions">
+    <button class="primary" id="run">คำนวณ</button>
+    <button id="copy">คัดลอก</button>
+   </div>
+
+   <div class="result" id="result"></div>
+  `;
+ }
+
+ if([
+  "HEX → RGB","RGB → HEX","RGB → HSL","HSL → RGB",
+  "HEX → HSL","สุ่มสี","Invert Color","Grayscale",
+  "Lighten Color","Darken Color","Complementary"
+ ].includes(name)){
+
+  return `
+   <label>สี</label>
+   <input id="input" placeholder="#3366ff">
+
+   <div class="actions">
+    <button class="primary" id="run">แปลง</button>
+    <button id="copy">คัดลอก</button>
+   </div>
+
+   <div class="result" id="result"></div>
+  `;
+ }
+
+ if([
+  "JSON Formatter","JSON Minifier","HTML Escape",
+  "HTML Unescape","URL Encode","URL Decode",
+  "Base64 Encode","Base64 Decode","Hex Encode",
+  "Hex Decode","Binary Encode","Binary Decode",
+  "JSON Stringify","JSON Pretty","JSON Compact",
+  "JSON Keys","JSON Values","JSON Sort"
+ ].includes(name)){
+
+  return `
+   <textarea id="input"
+   placeholder="วางข้อมูลที่นี่..."></textarea>
+
+   <div class="actions">
+    <button class="primary" id="run">ประมวลผล</button>
+    <button id="copy">คัดลอก</button>
+   </div>
+
+   <div class="result" id="result"></div>
+  `;
+ }
+
+ if([
+  "สร้างรหัสผ่าน","สุ่ม Password","สร้าง PIN",
+  "สุ่ม PIN 4 หลัก","สุ่ม PIN 6 หลัก","สุ่มรหัส 8 หลัก",
+  "สุ่ม Token","สุ่ม Secret","สุ่ม Hex","สุ่ม Base64"
+ ].includes(name)){
+
+  return `
+   <p style="color:var(--muted)">
+   สร้างข้อมูลแบบสุ่มด้วย Web Crypto API
+   </p>
+
+   <button class="primary" id="run">
+   สร้าง
+   </button>
+
+   <button id="copy">คัดลอก</button>
+
+   <div class="result" id="result"></div>
+  `;
+ }
+
+ return `
+  <label>ข้อมูล</label>
+  <input id="input" placeholder="ป้อนข้อมูล...">
+
+  <div class="actions">
+   <button class="primary" id="run">ทำงาน</button>
+   <button id="copy">คัดลอก</button>
+  </div>
+
+  <div class="result" id="result"></div>
+ `;
+}
+
+/* ==========================================================
+   BIND
+========================================================== */
+
+function bind(name){
+
+ const run=document.getElementById("run");
+ const copy=document.getElementById("copy");
+
+ if(run){
+
+  run.onclick=()=>{
+
+   let a=document.getElementById("a")?.value;
+   let b=document.getElementById("b")?.value;
+   let input=document.getElementById("input")?.value||"";
+
+   let result;
+
+   try{
+
+    if(a!==undefined&&b!==undefined)
+     result=math(name,Number(a),Number(b));
+    else
+     result=tool(name,input);
+
+   }catch(e){
+
+    result="❌ "+e.message;
+
+   }
+
+   document.getElementById("result").textContent=
+   String(result);
+  };
+ }
+
+ if(copy){
+
+  copy.onclick=async()=>{
+
+   const result=document.getElementById("result");
+
+   if(!result)return;
+
+   await navigator.clipboard.writeText(result.textContent);
+
+   toast("คัดลอกแล้ว ✅");
+  };
+ }
+}
+
+/* ==========================================================
+   MATH ENGINE
+========================================================== */
+
+function math(n,a,b){
+
+ switch(n){
+
+ case"เครื่องคิดเลข":
+  return a+b;
+
+ case"เปอร์เซ็นต์":
+  return `${a}% ของ ${b} = ${a*b/100}`;
+
+ case"ส่วนลด":
+  return `ราคาหลังลด = ${a-(a*b/100)}`;
+
+ case"ทิป":
+  return `ยอดรวม = ${a+(a*b/100)}`;
+
+ case"ค่าเฉลี่ย":
+  return (a+b)/2;
+
+ case"ผลรวม":
+  return a+b;
+
+ case"GCD":
+  return gcd(a,b);
+
+ case"LCM":
+  return Math.abs(a*b)/gcd(a,b);
+
+ case"เลขยกกำลัง":
+  return Math.pow(a,b);
+
+ case"อัตราส่วน":
+  return `${a}:${b}`;
+
+ case"กฎสาม":
+  return `ผลลัพธ์ = ${a*b}`;
+
+ case"กำไร":
+  return a-b;
+
+ case"มาร์จิน":
+  return ((a-b)/a*100).toFixed(2)+"%";
+
+ case"ส่วนต่าง":
+  return Math.abs(a-b);
+
+ default:
+  return a+b;
+ }
+}
+
+function gcd(a,b){
+
+ a=Math.abs(a);
+ b=Math.abs(b);
+
+ while(b){
+  [a,b]=[b,a%b];
+ }
+
+ return a;
+}
+
+/* ==========================================================
+   MAIN TOOL ENGINE
+========================================================== */
+
+function tool(n,v){
+
+ switch(n){
+
+ /* ---------- TEXT ---------- */
+
+ case"นับตัวอักษร":
+  return [...v].length;
+
+ case"นับคำ":
+  return v.trim()?v.trim().split(/\s+/).length:0;
+
+ case"นับบรรทัด":
+  return v?v.split(/\r?\n/).length:0;
+
+ case"ตัวพิมพ์ใหญ่":
+  return v.toUpperCase();
+
+ case"ตัวพิมพ์เล็ก":
+  return v.toLowerCase();
+
+ case"Title Case":
+  return v.toLowerCase()
+  .replace(/\b\w/g,x=>x.toUpperCase());
+
+ case"กลับข้อความ":
+  return [...v].reverse().join("");
+
+ case"ลบช่องว่าง":
+  return v.replace(/\s+/g,"");
+
+ case"Trim":
+  return v.trim();
+
+ case"ลบบรรทัดซ้ำ":
+  return [...new Set(v.split(/\r?\n/))].join("\n");
+
+ case"เรียงบรรทัด":
+  return v.split(/\r?\n/).sort().join("\n");
+
+ case"เรียงกลับบรรทัด":
+  return v.split(/\r?\n/).sort().reverse().join("\n");
+
+ case"ลบอักขระซ้ำ":
+  return [...new Set(v)].join("");
+
+ case"Slugify":
+  return v.toLowerCase()
+   .trim()
+   .replace(/[^\p{L}\p{N}]+/gu,"-")
+   .replace(/^-|-$/g,"");
+
+ case"JSON Stringify":
+ case"JSON Escape":
+  return JSON.stringify(v);
+
+ case"JSON Formatter":
+ case"JSON Pretty":
+  return JSON.stringify(JSON.parse(v),null,2);
+
+ case"JSON Minifier":
+ case"JSON Compact":
+  return JSON.stringify(JSON.parse(v));
+
+ case"JSON Keys":
+  return Object.keys(JSON.parse(v)).join("\n");
+
+ case"JSON Values":
+  return Object.values(JSON.parse(v))
+   .map(String).join("\n");
+
+ case"JSON Sort":
+  return JSON.stringify(
+   Object.fromEntries(
+    Object.entries(JSON.parse(v)).sort()
+   ),null,2);
+
+ case"URL Encode":
+  return encodeURIComponent(v);
+
+ case"URL Decode":
+  return decodeURIComponent(v);
+
+ case"Base64 Encode":
+  return btoa(unescape(encodeURIComponent(v)));
+
+ case"Base64 Decode":
+  return decodeURIComponent(escape(atob(v)));
+
+ case"HTML Escape":
+  return v
+   .replaceAll("&","&amp;")
+   .replaceAll("<","&lt;")
+   .replaceAll(">","&gt;")
+   .replaceAll('"',"&quot;");
+
+ case"HTML Unescape":
+  return v
+   .replaceAll("&lt;","<")
+   .replaceAll("&gt;",">")
+   .replaceAll("&quot;",'"')
+   .replaceAll("&amp;","&");
+
+ case"Hex Encode":
+  return [...v]
+   .map(x=>x.codePointAt(0).toString(16))
+   .join(" ");
+
+ case"Hex Decode":
+  return v.trim().split(/\s+/)
+   .map(x=>String.fromCodePoint(parseInt(x,16)))
+   .join("");
+
+ case"Binary Encode":
+  return [...v]
+   .map(x=>x.codePointAt(0).toString(2))
+   .join(" ");
+
+ case"Binary Decode":
+  return v.trim().split(/\s+/)
+   .map(x=>String.fromCodePoint(parseInt(x,2)))
+   .join("");
+
+ /* ---------- RANDOM ---------- */
+
+ case"สุ่มตัวเลข":
+  return rand(1,100);
+
+ case"สุ่ม 1-10":
+  return rand(1,10);
+
+ case"สุ่ม 1-100":
+  return rand(1,100);
+
+ case"สุ่ม 1-1000":
+  return rand(1,1000);
+
+ case"โยนเหรียญ":
+  return Math.random()<.5?"หัว":"ก้อย";
+
+ case"ทอยลูกเต๋":
+  return rand(1,6);
+
+ case"สุ่ม Yes/No":
+  return Math.random()<.5?"Yes":"No";
+
+ case"สุ่มจริง/เท็จ":
+  return Math.random()<.5?"จริง":"เท็จ";
+
+ case"สุ่มชื่อ":
+  return pick(["Alex","Beam","Game","Max","Boss","Mint","Sky","Nong"]);
+
+ case"สุ่มคำ":
+  return pick(["AI","เว็บ","โค้ด","เกม","เครื่องมือ","เทคโนโลยี"]);
+
+ case"สุ่มตัวอักษร":
+  return String.fromCharCode(rand(65,90));
+
+ case"สุ่ม Emoji":
+  return pick(["😀","🔥","🚀","🎮","⭐","😎","💎","🎯"]);
+
+ case"สุ่มไอคอน":
+  return pick(["⚡","🛠️","🔧","🚀","💎","⭐","🎯"]);
+
+ case"สุ่มทีม":
+  return pick(["ทีม A","ทีม B","ทีม C","ทีม D"]);
+
+ case"สุ่มอันดับ":
+  return "#"+rand(1,10);
+
+ case"จับฉลาก":
+  return pick(
+   v.split(/[,\n]/).map(x=>x.trim()).filter(Boolean)
+  );
+
+ /* ---------- SECURITY ---------- */
+
+ case"สร้างรหัสผ่าน":
+ case"สุ่ม Password":
+  return randomPassword(18);
+
+ case"สร้าง PIN":
+ case"สุ่ม PIN 6 หลัก":
+  return String(rand(0,999999)).padStart(6,"0");
+
+ case"สุ่ม PIN 4 หลัก":
+  return String(rand(0,9999)).padStart(4,"0");
+
+ case"สุ่มรหัส 8 หลัก":
+  return randomPassword(8);
+
+ case"สุ่ม Token":
+  return cryptoHex(32);
+
+ case"สุ่ม Secret":
+  return cryptoHex(32);
+
+ case"สร้าง Salt":
+  return cryptoHex(16);
+
+ case"สุ่ม Hex":
+  return cryptoHex(16);
+
+ case"สุ่ม Base64":
+  return cryptoBase64(24);
+
+case"สุ่ม Bytes":
+  return cryptoHex(32);
+
+case"UUID Generator":
+case"UUID v4":
+  return crypto.randomUUID();
+
+case"ตรวจรหัสผ่าน":
+  return passwordStrength(v);
+
+case"Password Entropy":
+  return entropy(v);
+
+case"Mask Text":
+  return v.length < 3
+    ? "***"
+    : v[0] + "*".repeat(v.length - 2) + v.at(-1);
+
+case"ลบข้อมูลส่วนตัว":
+  return v
+    .replace(/\b[\w.+-]+@[\w.-]+\.\w+\b/g, "[EMAIL]")
+    .replace(/\b\d{9,16}\b/g, "[NUMBER]");
+
+
+/* =========================
+   DATE & TIME
+========================= */
+
+case"เวลาปัจจุบัน":
+case"วันที่วันนี้":
+  return new Date().toLocaleString("th-TH");
+
+case"Unix Now":
+case"Unix Timestamp":
+  return Math.floor(Date.now() / 1000);
+
+case"Unix → Date":
+case"Timestamp เป็นวันที่":
+  return new Date(Number(v) * 1000)
+    .toLocaleString("th-TH");
+
+case"Date → Unix":
+  return Math.floor(new Date(v).getTime() / 1000);
+
+case"ISO 8601":
+  return new Date().toISOString();
+
+case"UTC Time":
+  return new Date().toUTCString();
+
+case"วันในสัปดาห์":
+  return new Date(v)
+    .toLocaleDateString("th-TH", {
+      weekday:"long"
+    });
+
+case"จำนวนวันในเดือน":{
+  const d = new Date(v);
+  return new Date(
+    d.getFullYear(),
+    d.getMonth() + 1,
+    0
+  ).getDate();
+}
+
+case"ปีอธิกสุรทิน":{
+  const y = Number(v);
+
+  return y % 400 === 0 ||
+    (y % 4 === 0 && y % 100 !== 0)
+    ? "ใช่"
+    : "ไม่ใช่";
+}
+
+case"อายุ":{
+  const d = new Date(v);
+  const now = new Date();
+
+  let age =
+    now.getFullYear() -
+    d.getFullYear();
+
+  const m =
+    now.getMonth() -
+    d.getMonth();
+
+  if(
+    m < 0 ||
+    (m === 0 && now.getDate() < d.getDate())
+  ){
+    age--;
+  }
+
+  return age + " ปี";
+}
+
+case"สัปดาห์ของปี":{
+  const d = new Date(v);
+  const start = new Date(d.getFullYear(),0,1);
+
+  return Math.ceil(
+    (((d - start) / 86400000) +
+    start.getDay() + 1) / 7
+  );
+}
+
+
+/* =========================
+   COLOR
+========================= */
+
+case"HEX → RGB":
+  return hexToRgb(v);
+
+case"RGB → HEX":
+  return rgbToHex(v);
+
+case"สุ่มสี":
+  return "#" +
+    rand(0,0xffffff)
+    .toString(16)
+    .padStart(6,"0");
+
+case"Invert Color":
+case"Complementary":
+  return invert(v);
+
+case"Grayscale":
+  return gray(v);
+
+case"Lighten Color":
+  return mix(v,"#ffffff",0.2);
+
+case"Darken Color":
+  return mix(v,"#000000",0.2);
+
+case"CSS Color":
+  return `color:${v};`;
+
+case"CSS Variable":
+  return `--color-primary:${v};`;
+
+case"CSS Background":
+  return `background:${v};`;
+
+case"Gradient Generator":
+case"CSS Gradient":
+  return `linear-gradient(135deg,${v},#000000)`;
+
+case"Shadow Generator":
+  return `box-shadow:0 10px 30px ${v}66;`;
+
+case"RGBA Preview":
+  return `rgba(${v},1)`;
+
+
+/* =========================
+   UNIT CONVERTER
+========================= */
+
+case"เมตร → ฟุต":
+  return Number(v) * 3.280839895;
+
+case"ฟุต → เมตร":
+  return Number(v) / 3.280839895;
+
+case"กิโลเมตร → ไมล์":
+  return Number(v) * 0.621371192;
+
+case"ไมล์ → กิโลเมตร":
+  return Number(v) / 0.621371192;
+
+case"กิโลกรัม → ปอนด์":
+  return Number(v) * 2.20462262;
+
+case"ปอนด์ → กิโลกรัม":
+  return Number(v) / 2.20462262;
+
+case"กรัม → ออนซ์":
+  return Number(v) * 0.035273962;
+
+case"ลิตร → แกลลอน":
+  return Number(v) * 0.264172052;
+
+case"แกลลอน → ลิตร":
+  return Number(v) / 0.264172052;
+
+case"เซนติเมตร → นิ้ว":
+  return Number(v) / 2.54;
+
+case"นิ้ว → เซนติเมตร":
+  return Number(v) * 2.54;
+
+case"กม./ชม. → ไมล์/ชม.":
+  return Number(v) * 0.621371;
+
+case"ไมล์/ชม. → กม./ชม.":
+  return Number(v) / 0.621371;
+
+case"เซลเซียส → ฟาเรนไฮต์":
+  return Number(v) * 9 / 5 + 32;
+
+case"ฟาเรนไฮต์ → เซลเซียส":
+  return (Number(v) - 32) * 5 / 9;
+
+case"เซลเซียส → เคลวิน":
+  return Number(v) + 273.15;
+
+case"ไบต์ → KB":
+  return Number(v) / 1024;
+
+case"KB → MB":
+  return Number(v) / 1024;
+
+case"MB → GB":
+  return Number(v) / 1024;
+
+case"GB → TB":
+  return Number(v) / 1024;
+
+
+/* =========================
+   WEB TOOLS
+========================= */
+
+case"ตรวจ URL":{
+  try{
+    const u = new URL(v);
+
+    return "✅ URL ถูกต้อง\n\n" +
+      "Protocol: " + u.protocol +
+      "\nHost: " + u.hostname +
+      "\nPath: " + u.pathname;
+  }
+  catch{
+    return "❌ URL ไม่ถูกต้อง";
+  }
+}
+
+case"แยก URL":{
+  const u = new URL(v);
+
+  return JSON.stringify({
+    protocol:u.protocol,
+    hostname:u.hostname,
+    port:u.port,
+    pathname:u.pathname,
+    search:u.search,
+    hash:u.hash
+  },null,2);
+}
+
+case"Markdown Link":
+  return `[${v}](${v})`;
+
+case"Markdown Image":
+  return `![image](${v})`;
+
+case"HTML Link":
+  return `<a href="${v}">${v}</a>`;
+
+case"HTML Image":
+  return `<img src="${v}" alt="image">`;
+
+case"Canonical Tag":
+  return `<link rel="canonical" href="${v}">`;
+
+case"Meta Tags":
+  return `<meta name="description" content="${esc(v)}">`;
+
+case"Open Graph":
+  return `<meta property="og:description" content="${esc(v)}">`;
+
+case"Robots.txt":
+  return `User-agent: *
+Allow: /`;
+
+case"Sitemap XML":
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>${esc(v)}</loc>
+</url>
+</urlset>`;
+
+case"HTML Boilerplate":
+  return `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+<title>${esc(v || "เว็บไซต์")}</title>
+</head>
+<body>
+
+</body>
+</html>`;
+
+case"CSS Reset":
+  return `*,*::before,*::after{
+box-sizing:border-box
+}
+
+html,body{
+margin:0;
+padding:0
+}
+
+img{
+max-width:100%;
+display:block
+}
+
+button,input,textarea{
+font:inherit
+}`;
+
+case"JS Fetch Template":
+  return `fetch("${v || "https://example.com"}")
+.then(response => response.json())
+.then(data => {
+  console.log(data);
+})
+.catch(error => {
+  console.error(error);
+});`;
+
+case"cURL Generator":
+  return `curl "${v}"`;
+
+
+/* =========================
+   FILE / DATA
+========================= */
+
+case"MIME Guess":
+  return mime(v);
+
+case"ขนาดข้อความ":
+  return new Blob([v]).size + " bytes";
+
+case"Bytes → KB":
+  return Number(v) / 1024;
+
+case"KB → MB":
+  return Number(v) / 1024;
+
+case"MB → GB":
+  return Number(v) / 1024;
+
+case"JSON Download":
+  download(
+    v,
+    "data.json",
+    "application/json"
+  );
+  return "สร้างไฟล์ data.json แล้ว ✅";
+
+case"Text Download":
+  download(
+    v,
+    "text.txt",
+    "text/plain"
+  );
+  return "สร้างไฟล์ text.txt แล้ว ✅";
+
+case"CSV → JSON":
+  return JSON.stringify(
+    csvJson(v),
+    null,
+    2
+  );
+
+case"JSON → CSV":
+  return jsonCsv(v);
+
+
+/* =========================
+   GENERAL CALCULATORS
+========================= */
+
+case"BMI Calculator":{
+  const [w,h] =
+    v.split(/[,\s]+/).map(Number);
+
+  if(!w || !h)
+    return "รูปแบบ: น้ำหนัก,ส่วนสูง(cm)";
+
+  return (
+    w / Math.pow(h / 100,2)
+  ).toFixed(2);
+}
+
+case"พื้นที่สี่เหลี่ยม":{
+  const [a,b] =
+    v.split(/[,\s]+/).map(Number);
+
+  return a * b;
+}
+
+case"พื้นที่วงกลม":
+  return Math.PI *
+    Math.pow(Number(v),2);
+
+case"พื้นที่สามเหลี่ยม":{
+  const [a,b] =
+    v.split(/[,\s]+/).map(Number);
+
+  return 0.5 * a * b;
+}
+
+case"ปริมาตรลูกบาศก์":
+  return Math.pow(Number(v),3);
+
+case"ปริมาตรทรงกระบอก":{
+  const [r,h] =
+    v.split(/[,\s]+/).map(Number);
+
+  return Math.PI * r * r * h;
+}
+
+case"ดอกเบี้ย":{
+  const [p,r,t] =
+    v.split(/[,\s]+/).map(Number);
+
+  return p * r / 100 * t;
+}
+
+case"ดอกเบี้ยทบต้น":{
+  const [p,r,t] =
+    v.split(/[,\s]+/).map(Number);
+
+  return p *
+    Math.pow(1 + r / 100,t);
+}
+
+case"แบ่งบิล":{
+  const [bill,people] =
+    v.split(/[,\s]+/).map(Number);
+
+  return bill / people;
+}
+
+case"ภาษี":{
+  const [price,tax] =
+    v.split(/[,\s]+/).map(Number);
+
+  return price +
+    price * tax / 100;
+}
+
+case"เลขฐาน":{
+  const [value,from,to] =
+    v.split(/[,\s]+/);
+
+  return parseInt(
+    value,
+    Number(from)
+  ).toString(Number(to));
+}
+
+
+/* =========================
+   FALLBACK
+========================= */
+
+default:
+  return `เครื่องมือ "${n}" ยังไม่มี Logic เฉพาะ`;
+ }
+} 
+
+/* ==========================================================
+   HELPER FUNCTIONS
+========================================================== */
+
+function rand(min,max){
+  return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+function pick(arr){
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+function randomPassword(length){
+  const chars =
+    "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*";
+
+  let result="";
+
+  for(let i=0;i<length;i++){
+    result += chars[rand(0,chars.length-1)];
+  }
+
+  return result;
+}
+
+function cryptoHex(bytes){
+  const data=new Uint8Array(bytes);
+  crypto.getRandomValues(data);
+
+  return [...data]
+    .map(x=>x.toString(16).padStart(2,"0"))
+    .join("");
+}
+
+function cryptoBase64(bytes){
+  const data=new Uint8Array(bytes);
+  crypto.getRandomValues(data);
+
+  let binary="";
+
+  for(const byte of data){
+    binary+=String.fromCharCode(byte);
+  }
+
+  return btoa(binary);
+}
+
+function passwordStrength(password){
+
+  let score=0;
+
+  if(password.length>=8)score++;
+  if(password.length>=12)score++;
+  if(/[A-Z]/.test(password))score++;
+  if(/[a-z]/.test(password))score++;
+  if(/[0-9]/.test(password))score++;
+  if(/[^A-Za-z0-9]/.test(password))score++;
+
+  const levels=[
+    "อ่อนมาก ❌",
+    "อ่อน ⚠️",
+    "ปานกลาง 🟡",
+    "ดี 🟢",
+    "แข็งแรง 🟢",
+    "แข็งแรงมาก 💪",
+    "ยอดเยี่ยม 🔥"
+  ];
+
+  return levels[Math.min(score,6)];
+}
+
+function entropy(password){
+
+  let pool=0;
+
+  if(/[a-z]/.test(password))pool+=26;
+  if(/[A-Z]/.test(password))pool+=26;
+  if(/[0-9]/.test(password))pool+=10;
+  if(/[^A-Za-z0-9]/.test(password))pool+=32;
+
+  if(pool===0)return "0 bits";
+
+  return (
+    password.length*Math.log2(pool)
+  ).toFixed(2)+" bits";
+}
+
+function hexToRgb(hex){
+
+  let h=String(hex)
+    .trim()
+    .replace("#","");
+
+  if(h.length===3){
+    h=h.split("")
+      .map(x=>x+x)
+      .join("");
+  }
+
+  if(!/^[0-9a-fA-F]{6}$/.test(h)){
+    throw new Error("HEX ต้องเป็น #RRGGBB");
+  }
+
+  const n=parseInt(h,16);
+
+  return `rgb(${
+    (n>>16)&255
+  }, ${
+    (n>>8)&255
+  }, ${
+    n&255
+  })`;
+}
+
+function rgbToHex(value){
+
+  const nums=
+    String(value).match(/\d+/g);
+
+  if(!nums||nums.length<3){
+    throw new Error("ใส่ RGB เช่น 255,0,0");
+  }
+
+  return "#"+
+    nums.slice(0,3)
+      .map(x=>
+        Number(x)
+          .toString(16)
+          .padStart(2,"0")
+      )
+      .join("");
+}
+
+function invert(hex){
+
+  let h=String(hex)
+    .trim()
+    .replace("#","");
+
+  if(h.length===3){
+    h=h.split("")
+      .map(x=>x+x)
+      .join("");
+  }
+
+  const n=parseInt(h,16);
+
+  return "#"+
+    (0xFFFFFF^n)
+      .toString(16)
+      .padStart(6,"0");
+}
+
+function gray(hex){
+
+  const rgb=
+    hexToRgb(hex)
+      .match(/\d+/g)
+      .map(Number);
+
+  const value=Math.round(
+    rgb[0]*0.299+
+    rgb[1]*0.587+
+    rgb[2]*0.114
+  );
+
+  return `rgb(${value},${value},${value})`;
+}
+
+function mix(a,b,amount){
+
+  const c1=
+    hexToRgb(a)
+      .match(/\d+/g)
+      .map(Number);
+
+  const c2=
+    hexToRgb(b)
+      .match(/\d+/g)
+      .map(Number);
+
+  return rgbToHex(
+    `${Math.round(c1[0]+(c2[0]-c1[0])*amount)},
+     ${Math.round(c1[1]+(c2[1]-c1[1])*amount)},
+     ${Math.round(c1[2]+(c2[2]-c1[2])*amount)}`
+  );
+}
+
+function mime(filename){
+
+  const ext=
+    String(filename)
+      .split(".")
+      .pop()
+      .toLowerCase();
+
+  const types={
+    png:"image/png",
+    jpg:"image/jpeg",
+    jpeg:"image/jpeg",
+    gif:"image/gif",
+    webp:"image/webp",
+    svg:"image/svg+xml",
+    json:"application/json",
+    txt:"text/plain",
+    csv:"text/csv",
+    html:"text/html",
+    htm:"text/html",
+    css:"text/css",
+    js:"text/javascript",
+    mjs:"text/javascript",
+    xml:"application/xml",
+    pdf:"application/pdf",
+    zip:"application/zip",
+    mp3:"audio/mpeg",
+    wav:"audio/wav",
+    mp4:"video/mp4",
+    webm:"video/webm"
+  };
+
+  return types[ext]||"ไม่ทราบ MIME Type";
+}
+
+function csvJson(text){
+
+  const lines=
+    text.trim().split(/\r?\n/);
+
+  if(!lines.length)return [];
+
+  const headers=
+    lines[0]
+      .split(",")
+      .map(x=>x.trim());
+
+  return lines.slice(1).map(line=>{
+
+    const values=line.split(",");
+    const obj={};
+
+    headers.forEach((header,index)=>{
+      obj[header]=values[index]??"";
+    });
+
+    return obj;
+  });
+}
+
+function jsonCsv(text){
+
+  const data=JSON.parse(text);
+
+  if(!Array.isArray(data)){
+    throw new Error("JSON ต้องเป็น Array");
+  }
+
+  if(!data.length)return "";
+
+  const headers=[
+    ...new Set(
+      data.flatMap(x=>Object.keys(x))
+    )
+  ];
+
+  const rows=[
+    headers.join(",")
+  ];
+
+  for(const item of data){
+
+    rows.push(
+      headers.map(key=>{
+        const value=item[key]??"";
+
+        return `"${String(value)
+          .replaceAll('"','""')}"`;
+      }).join(",")
+    );
+
+  }
+
+  return rows.join("\n");
+}
+
+function download(
+  content,
+  filename,
+  type="text/plain"
+){
+
+  const blob=
+    new Blob([content],{type});
+
+  const url=
+    URL.createObjectURL(blob);
+
+  const a=
+    document.createElement("a");
+
+  a.href=url;
+  a.download=filename;
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(()=>{
+    URL.revokeObjectURL(url);
+  },1000);
+}
+
+function esc(value){
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+
+/* ==========================================================
+   UI HELPERS
+========================================================== */
+
+function toast(message){
+
+  const element=
+    document.getElementById("toast");
+
+  if(!element)return;
+
+  element.textContent=message;
+
+  element.classList.add("show");
+
+  setTimeout(()=>{
+    element.classList.remove("show");
+  },1600);
+}
+
+function theme(){
+
+  document.body
+    .classList
+    .toggle("light");
+
+  localStorage.setItem(
+    "ut_theme",
+    document.body.classList.contains("light")
+      ?"light"
+      :"dark"
+  );
+}
+
+
+/* ==========================================================
+   LOAD SAVED THEME
+========================================================== */
+
+if(
+  localStorage.getItem("ut_theme")==="light"
+){
+  document.body
+    .classList
+    .add("light");
+}
+
+
+/* ==========================================================
+   START APPLICATION
+========================================================== */
+
+makeCategories();
+render();
+
+console.log(
+  "ULTIMATE TOOLBOX:",
+  TOOLS.length,
+  "TOOLS LOADED"
+);
+
+console.assert(
+  TOOLS.length===240,
+  "จำนวนเครื่องมือไม่ครบ 240"
+);
+
+</script>
+
+</body>
+</html>
