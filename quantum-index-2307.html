@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#08080d">
+<meta name="description" content="MERIDIAN — Official Links">
+<title>MERIDIAN — Links</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+:root{
+  --bg:#07070b;
+  --card:rgba(255,255,255,.055);
+  --card2:rgba(255,255,255,.085);
+  --border:rgba(255,255,255,.11);
+  --text:#fff;
+  --muted:#92929d;
+  --accent:#805cff;
+  --accent2:#00d9ff;
+  --radius:22px;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  min-height:100vh;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 50% -10%,rgba(128,92,255,.30),transparent 35%),
+    radial-gradient(circle at 0% 60%,rgba(0,217,255,.10),transparent 30%),
+    var(--bg);
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  overflow-x:hidden;
+}
+
+/* =========================
+   LOADING SCREEN
+========================= */
+
+#loader{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  background:#06060a;
+  transition:.7s ease;
+}
+
+.loader-logo{
+  font-size:42px;
+  font-weight:1000;
+  letter-spacing:-3px;
+  background:linear-gradient(90deg,#fff,#8b6aff,#00ddff);
+  -webkit-background-clip:text;
+  color:transparent;
+  animation:pulse 1.5s infinite alternate;
+}
+
+.loader-bar{
+  width:180px;
+  height:3px;
+  margin-top:20px;
+  overflow:hidden;
+  border-radius:99px;
+  background:#17171f;
+}
+
+.loader-bar span{
+  display:block;
+  width:50%;
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  animation:load 1.2s infinite ease-in-out;
+}
+
+@keyframes load{
+  from{transform:translateX(-120%)}
+  to{transform:translateX(400%)}
+}
+
+@keyframes pulse{
+  from{opacity:.45;transform:scale(.97)}
+  to{opacity:1;transform:scale(1)}
+}
+
+/* =========================
+   BACKGROUND
+========================= */
+
+.grid{
+  position:fixed;
+  inset:0;
+  z-index:-3;
+  opacity:.25;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:45px 45px;
+  mask-image:linear-gradient(to bottom,#000,transparent 90%);
+}
+
+.orb{
+  position:fixed;
+  width:300px;
+  height:300px;
+  border-radius:50%;
+  filter:blur(100px);
+  opacity:.14;
+  z-index:-2;
+  pointer-events:none;
+}
+
+.orb.one{
+  background:#7d4cff;
+  top:5%;
+  left:-130px;
+  animation:float1 9s infinite alternate ease-in-out;
+}
+
+.orb.two{
+  background:#00d9ff;
+  top:45%;
+  right:-140px;
+  animation:float2 11s infinite alternate ease-in-out;
+}
+
+.orb.three{
+  background:#ff2da6;
+  bottom:-170px;
+  left:35%;
+  animation:float3 12s infinite alternate ease-in-out;
+}
+
+@keyframes float1{
+  to{transform:translate(80px,60px)}
+}
+
+@keyframes float2{
+  to{transform:translate(-70px,-50px)}
+}
+
+@keyframes float3{
+  to{transform:translate(40px,-60px)}
+}
+
+/* =========================
+   PARTICLES
+========================= */
+
+#particles{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+}
+
+.particle{
+  position:absolute;
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:#fff;
+  opacity:.35;
+  animation:particleMove linear infinite;
+}
+
+@keyframes particleMove{
+  from{
+    transform:translateY(110vh);
+    opacity:0;
+  }
+  15%{opacity:.4}
+  85%{opacity:.4}
+  to{
+    transform:translateY(-10vh);
+    opacity:0;
+  }
+}
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container{
+  width:min(680px,calc(100% - 28px));
+  margin:auto;
+  padding:42px 0 35px;
+}
+
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.top-btn{
+  width:40px;
+  height:40px;
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:rgba(255,255,255,.045);
+  color:#fff;
+  cursor:pointer;
+  backdrop-filter:blur(15px);
+  transition:.2s;
+}
+
+.top-btn:hover{
+  transform:translateY(-2px);
+  background:rgba(255,255,255,.09);
+}
+
+/* =========================
+   PROFILE
+========================= */
+
+.profile{
+  text-align:center;
+  animation:fadeUp .8s ease both;
+}
+
+.avatar{
+  width:112px;
+  height:112px;
+  margin:0 auto 18px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.18);
+  background:
+    radial-gradient(circle,#27213c,#0d0d13 65%);
+  box-shadow:
+    0 0 0 8px rgba(255,255,255,.025),
+    0 0 55px rgba(128,92,255,.35);
+}
+
+.avatar::before{
+  content:"M";
+  position:relative;
+  z-index:2;
+  font-size:53px;
+  font-weight:1000;
+  font-style:italic;
+  letter-spacing:-7px;
+  background:linear-gradient(135deg,#fff,#a88cff,#36ddff);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.avatar::after{
+  content:"";
+  position:absolute;
+  width:150%;
+  height:150%;
+  background:conic-gradient(
+    transparent,
+    rgba(255,255,255,.35),
+    transparent 25%
+  );
+  animation:spin 5s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+.name{
+  font-size:clamp(30px,8vw,42px);
+  font-weight:1000;
+  letter-spacing:-1.5px;
+}
+
+.verify{
+  display:inline-grid;
+  place-items:center;
+  width:20px;
+  height:20px;
+  margin-left:4px;
+  border-radius:50%;
+  background:#7251ff;
+  font-size:12px;
+  vertical-align:6px;
+  box-shadow:0 0 18px rgba(114,81,255,.6);
+}
+
+.handle{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.bio{
+  margin:15px auto 0;
+  max-width:520px;
+  line-height:1.7;
+  font-size:14px;
+  color:#c7c7d0;
+}
+
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:15px;
+  padding:7px 12px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:rgba(255,255,255,.035);
+  color:#b9bac3;
+  font-size:11px;
+  backdrop-filter:blur(14px);
+}
+
+.status-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#4ade80;
+  box-shadow:0 0 12px #4ade80;
+}
+
+/* =========================
+   PROFILE ACTIONS
+========================= */
+
+.actions{
+  display:flex;
+  justify-content:center;
+  gap:9px;
+  margin:20px 0 26px;
+}
+
+.action{
+  padding:9px 14px;
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:rgba(255,255,255,.045);
+  color:#eee;
+  cursor:pointer;
+  font-size:12px;
+  transition:.2s;
+}
+
+.action:hover{
+  background:rgba(255,255,255,.09);
+  transform:translateY(-2px);
+}
+
+/* =========================
+   LINKS
+========================= */
+
+.links{
+  display:grid;
+  gap:13px;
+}
+
+.link{
+  position:relative;
+  min-height:76px;
+  display:flex;
+  align-items:center;
+  gap:15px;
+  padding:13px 17px 13px 13px;
+  color:#fff;
+  text-decoration:none;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.075),
+      rgba(255,255,255,.025)
+    );
+  backdrop-filter:blur(18px);
+  overflow:hidden;
+  transition:
+    transform .22s,
+    border-color .22s,
+    box-shadow .22s,
+    background .22s;
+  animation:fadeUp .6s ease both;
+}
+
+.link:nth-child(1){animation-delay:.05s}
+.link:nth-child(2){animation-delay:.1s}
+.link:nth-child(3){animation-delay:.15s}
+.link:nth-child(4){animation-delay:.2s}
+.link:nth-child(5){animation-delay:.25s}
+.link:nth-child(6){animation-delay:.3s}
+
+.link:hover{
+  transform:translateY(-4px) scale(1.008);
+  border-color:rgba(255,255,255,.2);
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.25),
+    0 0 35px rgba(128,92,255,.08);
+}
+
+.link:active{
+  transform:scale(.98);
+}
+
+.icon{
+  width:48px;
+  height:48px;
+  flex:0 0 48px;
+  display:grid;
+  place-items:center;
+  border-radius:15px;
+  background:#15151c;
+  border:1px solid rgba(255,255,255,.1);
+  z-index:2;
+}
+
+.icon svg{
+  width:25px;
+  height:25px;
+  fill:currentColor;
+}
+
+.tiktok{color:#fff}
+.facebook{color:#5c8dff}
+.instagram{color:#ff75b5}
+.roblox{color:#fff}
+.code{color:#9b82ff}
+
+.link-info{
+  flex:1;
+  min-width:0;
+  z-index:2;
+}
+
+.link-title{
+  font-size:15px;
+  font-weight:850;
+}
+
+.link-desc{
+  margin-top:4px;
+  color:#92939e;
+  font-size:12px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.arrow{
+  color:#777985;
+  font-size:22px;
+  transition:.2s;
+  z-index:2;
+}
+
+.link:hover .arrow{
+  color:#fff;
+  transform:translateX(4px);
+}
+
+/* =========================
+   FEATURED SCRIPT HUB
+========================= */
+
+.featured{
+  border-color:rgba(129,91,255,.5);
+  background:
+    radial-gradient(
+      circle at 90% 20%,
+      rgba(128,92,255,.25),
+      transparent 38%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(128,92,255,.13),
+      rgba(255,255,255,.035)
+    );
+  box-shadow:
+    0 15px 50px rgba(90,55,210,.18);
+}
+
+.featured .icon{
+  background:linear-gradient(145deg,#805cff,#392080);
+  box-shadow:0 0 28px rgba(128,92,255,.3);
+}
+
+.badge{
+  display:inline-block;
+  margin-left:6px;
+  padding:3px 7px;
+  border-radius:999px;
+  font-size:8px;
+  letter-spacing:.6px;
+  color:#c2b5ff;
+  background:rgba(128,92,255,.18);
+  border:1px solid rgba(128,92,255,.3);
+  vertical-align:2px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.footer{
+  margin-top:28px;
+  text-align:center;
+  color:#60616b;
+  font-size:11px;
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:25px;
+  transform:translate(-50%,25px);
+  opacity:0;
+  pointer-events:none;
+  z-index:999;
+  padding:11px 16px;
+  border-radius:13px;
+  background:rgba(18,18,24,.92);
+  border:1px solid var(--border);
+  color:#fff;
+  font-size:12px;
+  backdrop-filter:blur(16px);
+  transition:.25s;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+/* =========================
+   ANIMATION
+========================= */
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(18px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =========================
+   LIGHT MODE
+========================= */
+
+body.light{
+  --bg:#f4f5f9;
+  --text:#101116;
+  --muted:#6d6e78;
+  --card:rgba(0,0,0,.04);
+  --border:rgba(0,0,0,.09);
+
+  background:
+    radial-gradient(circle at 50% -10%,rgba(128,92,255,.18),transparent 35%),
+    #f4f5f9;
+}
+
+body.light .link,
+body.light .top-btn,
+body.light .action,
+body.light .status{
+  background:rgba(255,255,255,.65);
+  color:#111;
+}
+
+body.light .link-desc,
+body.light .handle{
+  color:#73747d;
+}
+
+body.light .grid{
+  opacity:.5;
+}
+
+body.light .icon{
+  background:#fff;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:480px){
+
+  .container{
+    padding-top:30px;
+  }
+
+  .avatar{
+    width:96px;
+    height:96px;
+  }
+
+  .avatar::before{
+    font-size:44px;
+  }
+
+  .link{
+    min-height:70px;
+    border-radius:18px;
+  }
+
+  .icon{
+    width:44px;
+    height:44px;
+    flex-basis:44px;
+    border-radius:13px;
+  }
+
+  .link-title{
+    font-size:14px;
+  }
+
+  .link-desc{
+    font-size:11px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    animation-duration:.001ms!important;
+    transition-duration:.001ms!important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">MERIDIAN</div>
+  <div class="loader-bar">
+    <span></span>
+  </div>
+</div>
+
+<div class="grid"></div>
+
+<div class="orb one"></div>
+<div class="orb two"></div>
+<div class="orb three"></div>
+
+<div id="particles"></div>
+
+<main class="container">
+
+  <!-- TOP BUTTONS -->
+  <div class="topbar">
+
+    <button
+      class="top-btn"
+      id="themeBtn"
+      title="เปลี่ยนธีม">
+      ☼
+    </button>
+
+    <button
+      class="top-btn"
+      id="shareTop"
+      title="แชร์">
+      ↗
+    </button>
+
+  </div>
+
+  <!-- PROFILE -->
+  <section class="profile">
+
+    <div class="avatar"></div>
+
+    <h1 class="name">
+      MERIDIAN
+      <span class="verify">✓</span>
+    </h1>
+
+    <div class="handle">
+      @meridian_tle
+    </div>
+
+    <p class="bio">
+      Roblox Script Creator • TSB • UI & Tools<br>
+      รวมช่องทางทั้งหมดของผมไว้ที่นี่ 👇
+    </p>
+
+    <div class="status">
+      <span class="status-dot"></span>
+      All systems online
+    </div>
+
+    <div class="actions">
+
+      <button
+        class="action"
+        id="shareBtn">
+        ↗ แชร์โปรไฟล์
+      </button>
+
+      <button
+        class="action"
+        id="copyBtn">
+        ⧉ คัดลอกลิงก์
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- LINKS -->
+  <section class="links">
+
+
+    <!-- TIKTOK MAIN -->
+    <a
+      class="link"
+      data-name="TikTok ช่องหลัก"
+      href="https://www.tiktok.com/@bacon_therealone?_r=1&_t=ZS-99CYa7Q2lNA"
+      target="_blank"
+      rel="noopener noreferrer">
+
+      <div class="icon tiktok">
+
+        <svg viewBox="0 0 24 24">
+          <path d="M15.7 3c.25 2.05 1.4 3.4 3.3 3.65v3.05c-1.25-.03-2.38-.34-3.3-.9v6.55A6.55 6.55 0 1 1 10 9.02v3.35a3.25 3.25 0 1 0 2.4 3.13V3h3.3Z"/>
+        </svg>
+
+      </div>
+
+      <div class="link-info">
+
+        <div class="link-title">
+          TikTok — ช่องหลัก
+        </div>
+
+        <div class="link-desc">
+          @bacon_therealone
+        </div>
+
+      </div>
+
+      <div class="arrow">
+        ›
+      </div>
+
+    </a>
+
+
+    <!-- TIKTOK TEST -->
+    <a
+      class="link"
+      data-name="TikTok ช่องลอง"
+      href="https://www.tiktok.com/@meridian_tle?_r=1&_t=ZS-99CYaDqqpog"
+      target="_blank"
+      rel="noopener noreferrer">
+
+      <div class="icon tiktok">
+
+        <svg viewBox="0 0 24 24">
+          <path d="M15.7 3c.25 2.05 1.4 3.4 3.3 3.65v3.05c-1.25-.03-2.38-.34-3.3-.9v6.55A6.55 6.55 0 1 1 10 9.02v3.35a3.25 3.25 0 1 0 2.4 3.13V3h3.3Z"/>
+        </svg>
+
+      </div>
+
+      <div class="link-info">
+
+        <div class="link-title">
+          TikTok — ช่องลอง
+        </div>
+
+        <div class="link-desc">
+          @meridian_tle
+        </div>
+
+      </div>
+
+      <div class="arrow">
+        ›
+      </div>
+
+    </a>
+
+
+    <!-- FACEBOOK -->
+    <a
+      class="link"
+      data-name="Facebook"
+      href="https://www.facebook.com/share/19gPFsCuBg/"
+      target="_blank"
+      rel="noopener noreferrer">
+
+      <div class="icon facebook">
+
+        <svg viewBox="0 0 24 24">
+          <path d="M13.7 21v-8h2.7l.4-3h-3.1V8.1c0-.9.25-1.5 1.55-1.5h1.65V3.9c-.29-.04-1.28-.12-2.43-.12-2.4 0-4.05 1.47-4.05 4.18V10H7.7v3H10v8h3.7Z"/>
+        </svg>
+
+      </div>
+
+      <div class="link-info">
+
+        <div class="link-title">
+          Facebook
+        </div>
+
+        <div class="link-desc">
+          ติดตาม Facebook ของผม
+        </div>
+
+      </div>
+
+      <div class="arrow">
+        ›
+      </div>
+
+    </a>
+
+
+    <!-- INSTAGRAM -->
+    <a
+      class="link"
+      data-name="Instagram"
+      href="https://www.instagram.com/toxwqrt?igsi=MWZlZHRlMW43cG1j"
+      target="_blank"
+      rel="noopener noreferrer">
+
+      <div class="icon instagram">
+
+        <svg viewBox="0 0 24 24">
+          <path d="M7.2 2h9.6A5.2 5.2 0 0 1 22 7.2v9.6a5.2 5.2 0 0 1-5.2 5.2H7.2A5.2 5.2 0 0 1 2 16.8V7.2A5.2 5.2 0 0 1 7.2 2Zm-.1 2A3.1 3.1 0 0 0 4 7.1v9.8A3.1 3.1 0 0 0 7.1 20h9.8a3.1 3.1 0 0 0 3.1-3.1V7.1A3.1 3.1 0 0 0 16.9 4H7.1Zm9.95 1.5a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/>
+        </svg>
+
+      </div>
+
+      <div class="link-info">
+
+        <div class="link-title">
+          Instagram
+        </div>
+
+        <div class="link-desc">
+          @toxwqrt
+        </div>
+
+      </div>
+
+      <div class="arrow">
+        ›
+      </div>
+
+    </a>
+
+
+    <!-- ROBLOX -->
+    <a
+      class="link"
+      data-name="TSB V-MAP"
+      href="https://www.roblox.com/share?code=23574e11e8678340bde7391529b9e746&type=Server"
+      target="_blank"
+      rel="noopener noreferrer">
+
+      <div class="icon roblox">
+
+        <svg viewBox="0 0 24 24">
+          <path d="m5 3 16 4-4 16-16-4L5 3Zm5.15 6.6 4.25 1.06-1.06 4.25-4.25-1.06 1.06-4.25Z"/>
+        </svg>
+
+      </div>
+
+      <div class="link-info">
+
+        <div class="link-title">
+          TSB V-MAP
+          <span class="badge">
+            ROBLOX
+          </span>
+        </div>
+
+        <div class="link-desc">
+          เข้าเซิร์ฟเวอร์ V-MAP
+        </div>
+
+      </div>
+
+      <div class="arrow">
+        ›
+      </div>
+
+    </a>
+
+
+    <!-- SCRIPT HUB -->
+    <a
+      class="link featured"
+      data-name="Script Hub"
+      href="https://hfutposhdhehheh-source.github.io/NinjaStrikeHub/"
+      target="_blank"
+      rel="noopener noreferrer">
+
+      <div class="icon code">
+
+        <svg viewBox="0 0 24 24">
+          <path d="m8.4 7.2-4.8 4.8 4.8 4.8 1.4-1.4L6.4 12l3.4-3.4-1.4-1.4Zm7.2 0-1.4 1.4 3.4 3.4-3.4 3.4 1.4 1.4 4.8-4.8-4.8-4.8ZM13.7 5l-4 14h2.1l4-14h-2.1Z"/>
+        </svg>
+
+      </div>
+
+      <div class="link-info">
+
+        <div class="link-title">
+          Script Hub
+          <span class="badge">
+            FEATURED
+          </span>
+        </div>
+
+        <div class="link-desc">
+          รวมสคริปต์ Roblox ของผม — เปิดเว็บไซต์
+        </div>
+
+      </div>
+
+      <div class="arrow">
+        ›
+      </div>
+
+    </a>
+
+  </section>
+
+
+  <footer class="footer">
+    © 2026 MERIDIAN • All links in one place
+  </footer>
+
+</main>
+
+
+<!-- TOAST -->
+<div
+  class="toast"
+  id="toast">
+</div>
+
+
+<script>
+
+/* =========================
+   LOADER
+========================= */
+
+window.addEventListener("load",()=>{
+
+  setTimeout(()=>{
+
+    const loader=document.getElementById("loader");
+
+    loader.style.opacity="0";
+    loader.style.pointerEvents="none";
+
+    setTimeout(()=>{
+      loader.remove();
+    },700);
+
+  },700);
+
+});
+
+
+/* =========================
+   PARTICLES
+========================= */
+
+const particleBox=document.getElementById("particles");
+
+for(let i=0;i<45;i++){
+
+  const p=document.createElement("span");
+
+  p.className="particle";
+
+  p.style.left=Math.random()*100+"%";
+
+  p.style.animationDuration=
+    (7+Math.random()*10)+"s";
+
+  p.style.animationDelay=
+    (-Math.random()*12)+"s";
+
+  p.style.opacity=
+    (.15+Math.random()*.4);
+
+  const size=
+    1+Math.random()*3;
+
+  p.style.width=size+"px";
+  p.style.height=size+"px";
+
+  particleBox.appendChild(p);
+
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+const toast=document.getElementById("toast");
+
+function showToast(text){
+
+  toast.textContent=text;
+
+  toast.classList.add("show");
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer=setTimeout(()=>{
+
+    toast.classList.remove("show");
+
+  },1800);
+
+}
+
+
+/* =========================
+   COPY PROFILE
+========================= */
+
+document.getElementById("copyBtn")
+.addEventListener("click",async()=>{
+
+  try{
+
+    await navigator.clipboard.writeText(
+      window.location.href
+    );
+
+    showToast("คัดลอกลิงก์โปรไฟล์แล้ว ✓");
+
+  }catch{
+
+    showToast(
+      "คัดลอกไม่ได้ — กดค้างที่ URL เพื่อคัดลอก"
+    );
+
+  }
+
+});
+
+
+/* =========================
+   SHARE
+========================= */
+
+async function shareProfile(){
+
+  if(navigator.share){
+
+    try{
+
+      await navigator.share({
+
+        title:"MERIDIAN — Links",
+
+        text:
+          "รวมช่องทางทั้งหมดของ MERIDIAN",
+
+        url:
+          window.location.href
+
+      });
+
+    }catch{}
+
+  }else{
+
+    try{
+
+      await navigator.clipboard.writeText(
+        window.location.href
+      );
+
+      showToast(
+        "คัดลอกลิงก์ไว้ให้แชร์แล้ว ✓"
+      );
+
+    }catch{
+
+      showToast(
+        "เบราว์เซอร์นี้ไม่รองรับการแชร์"
+      );
+
+    }
+
+  }
+
+}
+
+document.getElementById("shareBtn")
+.addEventListener("click",shareProfile);
+
+document.getElementById("shareTop")
+.addEventListener("click",shareProfile);
+
+
+/* =========================
+   THEME
+========================= */
+
+const themeBtn=
+  document.getElementById("themeBtn");
+
+const savedTheme=
+  localStorage.getItem("meridian-theme");
+
+if(savedTheme==="light"){
+
+  document.body.classList.add("light");
+
+  themeBtn.textContent="☾";
+
+}
+
+themeBtn.addEventListener("click",()=>{
+
+  document.body.classList.toggle("light");
+
+  const light=
+    document.body.classList.contains("light");
+
+  localStorage.setItem(
+    "meridian-theme",
+    light?"light":"dark"
+  );
+
+  themeBtn.textContent=
+    light?"☾":"☼";
+
+});
+
+
+/* =========================
+   CLICK STATISTICS
+========================= */
+
+const links=
+  document.querySelectorAll(".link");
+
+links.forEach(link=>{
+
+  link.addEventListener("click",()=>{
+
+    const name=
+      link.dataset.name;
+
+    const key=
+      "meridian-click-"+name;
+
+    const count=
+      Number(localStorage.getItem(key)||0)+1;
+
+    localStorage.setItem(
+      key,
+      count
+    );
+
+  });
+
+});
+
+
+/* =========================
+   MOUSE GLOW
+========================= */
+
+links.forEach(card=>{
+
+  card.addEventListener(
+    "pointermove",
+    e=>{
+
+      const rect=
+        card.getBoundingClientRect();
+
+      const x=
+        e.clientX-rect.left;
+
+      const y=
+        e.clientY-rect.top;
+
+      card.style.background=
+        `radial-gradient(
+          circle at ${x}px ${y}px,
+          rgba(255,255,255,.10),
+          rgba(255,255,255,.025) 35%
+        )`;
+
+    }
+  );
+
+  card.addEventListener(
+    "pointerleave",
+    ()=>{
+
+      card.style.background="";
+
+    }
+  );
+
+});
+
+
+/* =========================
+   KEYBOARD SUPPORT
+========================= */
+
+document.addEventListener(
+  "keydown",
+  e=>{
+
+    if(e.key==="Escape"){
+
+      document.activeElement?.blur();
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
