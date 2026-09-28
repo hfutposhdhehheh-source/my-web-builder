@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Script Inspector // Pro Hacker Suite</title>
+    <!-- Google Fonts & Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: { bg: '#080c14', panel: '#0f172a', border: '#1e293b', green: '#10b981', neon: '#06b6d4', alert: '#ef4444' }
+                    },
+                    fontFamily: {
+                        code: ['"Fira Code"', 'monospace'],
+                        sans: ['Prompt', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #080c14; color: #e2e8f0; font-family: 'Prompt', sans-serif; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+        .glow-effect { box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- TOP HEADER -->
+    <header class="border-b border-cyber-border bg-cyber-panel/50 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-lg bg-cyber-neon/10 border border-cyber-neon flex items-center justify-center text-cyber-neon text-xl font-bold">
+                <i class="fa-solid fa-terminal"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg tracking-wider text-white">CYBER_INSPECTOR <span class="text-xs text-cyber-neon px-2 py-0.5 rounded bg-cyber-neon/10 border border-cyber-neon/30">v2.5 Pro</span></h1>
+                <p class="text-xs text-slate-400">Advanced Lua Script Analyzer & Security Scanner</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2 text-xs">
+            <span class="flex items-center text-cyber-green"><span class="w-2 h-2 rounded-full bg-cyber-green animate-ping mr-2"></span> System Online</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <!-- LEFT SIDEBAR: CONTROLS & STATS (1 Column) -->
+        <div class="space-y-6">
+            <!-- Input Panel -->
+            <div class="bg-cyber-panel border border-cyber-border rounded-xl p-5 glow-effect">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-3 flex items-center">
+                    <i class="fa-solid fa-link text-cyber-neon mr-2"></i> โหลดสคริปต์ (Load Script)
+                </h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs text-slate-400 mb-1 block">วางลิงก์ GitHub Raw หรือ Lua URL</label>
+                        <input type="text" id="scriptUrl" placeholder="https://raw.githubusercontent.com/..." class="w-full bg-cyber-bg border border-cyber-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyber-neon transition">
+                    </div>
+                    <button onclick="loadScriptFromUrl()" class="w-full bg-cyber-neon/20 hover:bg-cyber-neon/30 border border-cyber-neon text-cyber-neon font-semibold py-2 rounded-lg text-sm transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> <span>ดึงข้อมูลโค้ด</span>
+                    </button>
+                    <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-cyber-border"></div>
+                        <span class="flex-shrink mx-4 text-slate-500 text-xs">OR UPLOAD</span>
+                        <div class="flex-grow border-t border-cyber-border"></div>
+                    </div>
+                    <label class="w-full border border-dashed border-cyber-border hover:border-cyber-neon rounded-lg p-3 text-center flex flex-col items-center justify-center cursor-pointer transition group">
+                        <i class="fa-solid fa-file-code text-slate-400 group-hover:text-cyber-neon mb-1"></i>
+                        <span class="text-xs text-slate-300 group-hover:text-cyber-neon">อัปโหลดไฟล์ .lua / .txt</span>
+                        <input type="file" id="fileInput" class="hidden" onchange="loadScriptFromFile(event)">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Security & Threat Scanner Card -->
+            <div class="bg-cyber-panel border border-cyber-border rounded-xl p-5">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-3 flex items-center">
+                    <i class="fa-solid fa-shield-halved text-cyber-green mr-2"></i> สแกนความปลอดภัย
+                </h2>
+                <div id="securityResults" class="space-y-2 text-xs text-slate-400">
+                    <p class="italic">ยังไม่ได้สแกน กรุณาโหลดสคริปต์ก่อน...</p>
+                </div>
+            </div>
+
+            <!-- Code Statistics Card -->
+            <div class="bg-cyber-panel border border-cyber-border rounded-xl p-5">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-3 flex items-center">
+                    <i class="fa-solid fa-chart-pie text-cyber-neon mr-2"></i> สถิติโค้ด
+                </h2>
+                <div id="codeStats" class="grid grid-cols-2 gap-3 text-center">
+                    <div class="bg-cyber-bg p-2 rounded-lg border border-cyber-border">
+                        <span class="block text-slate-500 text-[10px]">จำนวนบรรทัด</span>
+                        <span id="statLines" class="text-white font-bold text-sm">0</span>
+                    </div>
+                    <div class="bg-cyber-bg p-2 rounded-lg border border-cyber-border">
+                        <span class="block text-slate-500 text-[10px]">ขนาดไฟล์</span>
+                        <span id="statSize" class="text-white font-bold text-sm">0 KB</span>
+                    </div>
+                    <div class="bg-cyber-bg p-2 rounded-lg border border-cyber-border">
+                        <span class="block text-slate-500 text-[10px]">ฟังก์ชันทั้งหมด</span>
+                        <span id="statFuncs" class="text-white font-bold text-sm">0</span>
+                    </div>
+                    <div class="bg-cyber-bg p-2 rounded-lg border border-cyber-border">
+                        <span class="block text-slate-500 text-[10px]">ความเสี่ยง</span>
+                        <span id="statRisk" class="text-cyber-green font-bold text-sm">ปลอดภัย</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT VIEWER: CODE EDITOR & STRINGS (3 Columns) -->
+        <div class="lg:col-span-3 flex flex-col space-y-6">
+            
+            <!-- TAB NAVIGATION -->
+            <div class="flex space-x-2 border-b border-cyber-border pb-2">
+                <button onclick="switchTab('editor')" id="tabBtnEditor" class="px-4 py-2 bg-cyber-panel border border-cyber-neon text-cyber-neon rounded-lg text-sm font-semibold transition flex items-center space-x-2">
+                    <i class="fa-solid fa-code"></i> <span>ตัวแสดงโค้ด (Source Viewer)</span>
+                </button>
+                <button onclick="switchTab('strings')" id="tabBtnStrings" class="px-4 py-2 bg-cyber-panel border border-cyber-border text-slate-400 hover:text-white rounded-lg text-sm font-semibold transition flex items-center space-x-2">
+                    <i class="fa-solid fa-list-ul"></i> <span>สกัดข้อความลับ (Strings Extractor)</span>
+                </button>
+            </div>
+
+            <!-- VIEW 1: CODE EDITOR BOX -->
+            <div id="viewEditor" class="flex-1 bg-cyber-panel border border-cyber-border rounded-xl flex flex-col overflow-hidden shadow-2xl min-h-[500px]">
+                <!-- Editor Toolbar -->
+                <div class="bg-cyber-bg px-4 py-2 border-b border-cyber-border flex justify-between items-center text-xs text-slate-400">
+                    <span id="fileNameIndicator" class="flex items-center text-cyber-neon"><i class="fa-regular fa-file-lines mr-2"></i> no_file_loaded.lua</span>
+                    <div class="flex space-x-2">
+                        <button onclick="copyCode()" class="hover:text-white bg-cyber-border/50 px-2.5 py-1 rounded transition"><i class="fa-regular fa-copy mr-1"></i> Copy</button>
+                        <button onclick="downloadCode()" class="hover:text-white bg-cyber-border/50 px-2.5 py-1 rounded transition"><i class="fa-solid fa-download mr-1"></i> Download</button>
+                    </div>
+                </div>
+                <!-- Textarea Code Display -->
+                <div class="flex-1 relative flex">
+                    <textarea id="codeOutput" readonly class="w-full h-[550px] bg-cyber-panel text-slate-200 code-font p-4 text-xs leading-relaxed focus:outline-none resize-none" placeholder="-- โค้ดจะแสดงผลที่นี่หลังจากโหลดข้อมูล..."></textarea>
+                </div>
+            </div>
+
+            <!-- VIEW 2: STRINGS EXTRACTOR TABLE -->
+            <div id="viewStrings" class="hidden flex-1 bg-cyber-panel border border-cyber-border rounded-xl flex flex-col overflow-hidden shadow-2xl min-h-[500px] p-4">
+                <h3 class="text-sm font-semibold text-white mb-2"><i class="fa-solid fa-key text-cyber-neon mr-2"></i> ข้อความ / ลิงก์ที่สกัดพบในสคริปต์</h3>
+                <div class="flex-1 overflow-y-auto max-h-[520px]">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="border-b border-cyber-border text-slate-400">
+                                <th class="p-2">#</th>
+                                <th class="p-2">ข้อความ / URL / Webhook ที่พบ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stringsTableBody">
+                            <tr>
+                                <td colspan="2" class="p-4 text-center text-slate-500 italic">ยังไม่มีข้อมูล</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-4 border-t border-cyber-border text-xs text-slate-500">
+        Cyber Script Inspector // Secure Sandbox Environment &bull; Built for Advanced Developers
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let currentRawCode = "";
+
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            const btnEditor = document.getElementById('tabBtnEditor');
+            const btnStrings = document.getElementById('tabBtnStrings');
+            const viewEditor = document.getElementById('viewEditor');
+            const viewStrings = document.getElementById('viewStrings');
+
+            if (tabName === 'editor') {
+                btnEditor.className = "px-4 py-2 bg-cyber-panel border border-cyber-neon text-cyber-neon rounded-lg text-sm font-semibold transition flex items-center space-x-2";
+                btnStrings.className = "px-4 py-2 bg-cyber-panel border border-cyber-border text-slate-400 hover:text-white rounded-lg text-sm font-semibold transition flex items-center space-x-2";
+                viewEditor.classList.remove('hidden');
+                viewStrings.classList.add('hidden');
+            } else {
+                btnStrings.className = "px-4 py-2 bg-cyber-panel border border-cyber-neon text-cyber-neon rounded-lg text-sm font-semibold transition flex items-center space-x-2";
+                btnEditor.className = "px-4 py-2 bg-cyber-panel border border-cyber-border text-slate-400 hover:text-white rounded-lg text-sm font-semibold transition flex items-center space-x-2";
+                viewStrings.classList.remove('hidden');
+                viewEditor.classList.add('hidden');
+            }
+        }
+
+        // Load Script from URL (CORS Proxy applied for smooth Github fetching)
+        async function loadScriptFromUrl() {
+            let url = document.getElementById('scriptUrl').value.trim();
+            if (!url) {
+                alert("กรุณากรอกลิงก์สคริปต์ก่อนครับ!");
+                return;
+            }
+
+            // Auto-convert standard Github link to raw if needed
+            if (url.includes("github.com") && !url.includes("raw.githubusercontent.com")) {
+                url = url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/");
+            }
+
+            document.getElementById('codeOutput').value = "กำลังโหลดข้อมูลจากเซิร์ฟเวอร์...";
+
+            try {
+                // Use AllOrigins CORS proxy to bypass browser restrictions
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+
+                if (data.contents) {
+                    currentRawCode = data.contents;
+                    processLoadedScript(currentRawCode, url.split('/').pop() || "script.lua");
+                } else {
+                    alert("ไม่สามารถดึงข้อมูลโค้ดจากลิงก์นี้ได้");
+                    document.getElementById('codeOutput').value = "";
+                }
+            } catch (error) {
+                console.error(error);
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ (CORS หรือลิงก์ไม่ถูกต้อง)");
+                document.getElementById('codeOutput').value = "";
+            }
+        }
+
+        // Load Script from Local File Upload
+        function loadScriptFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentRawCode = e.target.result;
+                processLoadedScript(currentRawCode, file.name);
+            };
+            reader.readAsText(file);
+        }
+
+        // Core Processing Function (Analyzes Stats, Security, Strings)
+        function processLoadedScript(code, fileName) {
+            // 1. Set Code to Viewer
+            document.getElementById('codeOutput').value = code;
+            document.getElementById('fileNameIndicator').innerHTML = `<i class="fa-regular fa-file-lines mr-2"></i> ${fileName}`;
+
+            // 2. Calculate Statistics
+            const lines = code.split('\n').length;
+            const sizeKB = (new Blob([code]).size / 1024).toFixed(2);
+            
+            // Count functions (simple regex search for 'function')
+            const funcMatches = code.match(/function\s+\w+|function\s*\(/g);
+            const funcCount = funcMatches ? funcMatches.length : 0;
+
+            document.getElementById('statLines').innerText = lines;
+            document.getElementById('statSize').innerText = sizeKB + " KB";
+            document.getElementById('statFuncs').innerText = funcCount;
+
+            // 3. Security Scanner (Detect Webhook, loadstring, getfenv)
+            let securityHtml = "";
+            let riskLevel = "ปลอดภัย";
+            let riskColor = "text-cyber-green";
+
+            const hasWebhook = code.includes("discord.com/api/webhooks") || code.includes("webhook");
+            const hasLoadstring = code.includes("loadstring");
+            const hasGetFenv = code.includes("getfenv") || code.includes("setfenv");
+
+            if (hasWebhook) {
+                securityHtml += `<div class="flex items-center text-amber-400 bg-amber-500/10 p-2 rounded border border-amber-500/20"><i class="fa-solid fa-triangle-exclamation mr-2"></i> ตรวจพบ Discord Webhook (ระวังการดูดข้อมูล)</div>`;
+                riskLevel = "ปานกลาง";
+                riskColor = "text-amber-400";
+            }
+            if (hasLoadstring) {
+                securityHtml += `<div class="flex items-center text-red-400 bg-red-500/10 p-2 rounded border border-red-500/20"><i class="fa-solid fa-shield-virus mr-2"></i> มีการใช้คำสั่ง loadstring (รันโค้ดภายนอก)</div>`;
+                riskLevel = "สูง";
+                riskColor = "text-cyber-alert";
+            }
+            if (hasGetFenv) {
+                securityHtml += `<div class="flex items-center text-red-400 bg-red-500/10 p-2 rounded border border-red-500/20"><i class="fa-solid fa-lock mr-2"></i> มีการเข้าถึง Environment (GetFenv)</div>`;
+            }
+
+            if (!hasWebhook && !hasLoadstring && !hasGetFenv) {
+                securityHtml = `<div class="flex items-center text-cyber-green bg-cyber-green/10 p-2 rounded border border-cyber-green/20"><i class="fa-solid fa-circle-check mr-2"></i> ไม่พบคำสั่งน่าสงสัยในเบื้องต้น</div>`;
+            }
+
+            document.getElementById('securityResults').innerHTML = securityHtml;
+            document.getElementById('statRisk').innerText = riskLevel;
+            document.getElementById('statRisk').className = `${riskColor} font-bold text-sm`;
+
+            // 4. Extract Strings / URLs
+            extractStrings(code);
+        }
+
+        // Extract Strings and URLs using Regex
+        function extractStrings(code) {
+            const stringRegex = /["']([^"'\n]{6,})["']/g;
+            let match;
+            let results = [];
+            let uniqueSet = new Set();
+
+            while ((match = stringRegex.exec(code)) !== null) {
+                let str = match[1];
+                if (!uniqueSet.has(str)) {
+                    uniqueSet.add(str);
+                    results.push(str);
+                }
+            }
+
+            const tbody = document.getElementById('stringsTableBody');
+            if (results.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-slate-500 italic">ไม่พบข้อความยาวๆ หรือลิงก์ในสคริปต์นี้</td></tr>`;
+                return;
+            }
+
+            let html = "";
+            results.forEach((item, index) => {
+                let isUrl = item.startsWith('http://') || item.startsWith('https://');
+                let displayItem = isUrl ? `<a href="${item}" target="_blank" class="text-cyber-neon underline">${item}</a>` : item;
+                html += `<tr class="border-b border-cyber-border/50 hover:bg-cyber-bg/50">
+                    <td class="p-2 text-slate-500">${index + 1}</td>
+                    <td class="p-2 code-font break-all text-slate-300">${displayItem}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        // Copy Code Button
+        function copyCode() {
+            const codeBox = document.getElementById('codeOutput');
+            if (!codeBox.value) {
+                alert("ไม่มีโค้ดให้ก๊อปปี้!");
+                return;
+            }
+            navigator.clipboard.writeText(codeBox.value);
+            alert("คัดลอกโค้ดทั้งหมดเรียบร้อยแล้ว!");
+        }
+
+        // Download Code Button
+        function downloadCode() {
+            const codeBox = document.getElementById('codeOutput');
+            if (!codeBox.value) {
+                alert("ไม่มีโค้ดให้ดาวน์โหลด!");
+                return;
+            }
+            const blob = new Blob([codeBox.value], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
